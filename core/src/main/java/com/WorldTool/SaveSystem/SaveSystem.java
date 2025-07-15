@@ -93,4 +93,14 @@ public class SaveSystem {
     public BufferedImage LoadImage(int id) {
         return image.Load(id);
     }
+
+    // Conversion \\
+
+    public int[][] toARGBArray(BufferedImage input) {
+        return image.toARGBArray(input);
+    }
+
+    public BufferedImage fromARGBArray(int[][] argbArray) {
+        return image.fromARGBArray(argbArray);
+    }
 }

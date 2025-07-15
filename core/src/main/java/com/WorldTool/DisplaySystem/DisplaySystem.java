@@ -1,9 +1,14 @@
 package com.WorldTool.DisplaySystem;
 
+import java.awt.image.BufferedImage;
+import com.WorldTool.Block;
+import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class DisplaySystem {
+
+    private ToolManager toolManager;
 
     private SpriteBatch batch;
 
@@ -18,10 +23,12 @@ public class DisplaySystem {
 
     private Editor currentEditor;
 
-    public DisplaySystem() {
+    public DisplaySystem(ToolManager input) {
+        this.toolManager = input;
+
         batch = new SpriteBatch();
 
-        blockEditor = new BlockEditor();
+        blockEditor = new BlockEditor(this);
         propEditor = new PropEditor();
         itemEditor = new ItemEditor();
         entityEditor = new EntityEditor();
@@ -63,5 +70,37 @@ public class DisplaySystem {
 
     public void dispose() {
         batch.dispose();
+    }
+
+    // Save System \\
+
+    // Blocks \\
+
+    public void SaveBlocks(Block block) {
+        toolManager.SaveBlocks(block);
+    }
+
+    public Block LoadBlock (int id) {
+        return toolManager.LoadBlock(id);
+    }
+
+    // PNG \\
+
+    public void SaveImage(int id, BufferedImage input) {
+        toolManager.SaveImage(id, input);
+    }
+
+    public BufferedImage LoadImage(int id) {
+        return toolManager.LoadImage(id);
+    }
+        
+    // Conversion \\
+
+    public int[][] toARGBArray(BufferedImage input) {
+        return toolManager.toARGBArray(input);
+    }
+
+    public BufferedImage fromARGBArray(int[][] argbArray) {
+        return toolManager.fromARGBArray(argbArray);
     }
 }

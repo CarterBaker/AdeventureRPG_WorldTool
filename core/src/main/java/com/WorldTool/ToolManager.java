@@ -18,15 +18,15 @@ public class ToolManager implements Screen {
 
     @Override
     public void show() {
-        displaySystem = new DisplaySystem();
-        uiSystem = new UISystem(this);
         saveSystem = new SaveSystem();
+        displaySystem = new DisplaySystem(this);
+        uiSystem = new UISystem(this);
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         displaySystem.render(delta);
         uiSystem.render();
@@ -39,13 +39,16 @@ public class ToolManager implements Screen {
     }
 
     @Override
-    public void pause() { }
+    public void pause() {
+    }
 
     @Override
-    public void resume() { }
+    public void resume() {
+    }
 
     @Override
-    public void hide() { }
+    public void hide() {
+    }
 
     @Override
     public void dispose() {
@@ -66,7 +69,7 @@ public class ToolManager implements Screen {
         saveSystem.SaveBlocks(block);
     }
 
-    public Block LoadBlock (int id) {
+    public Block LoadBlock(int id) {
         return saveSystem.LoadBlock(id);
     }
 
@@ -82,5 +85,15 @@ public class ToolManager implements Screen {
 
     public BufferedImage LoadImage(int id) {
         return saveSystem.LoadImage(id);
+    }
+
+    // Conversion \\
+
+    public int[][] toARGBArray(BufferedImage input) {
+        return saveSystem.toARGBArray(input);
+    }
+
+    public BufferedImage fromARGBArray(int[][] argbArray) {
+        return saveSystem.fromARGBArray(argbArray);
     }
 }
