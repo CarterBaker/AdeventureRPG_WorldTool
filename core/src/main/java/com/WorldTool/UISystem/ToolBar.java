@@ -1,23 +1,43 @@
 package com.WorldTool.UISystem;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.WorldTool.ToolType;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class ToolBar {
 
-    public ToolBar(UISystem uiSystem) {
+    public ToolBar(UISystem uiSystem, float height) {
+        Skin skin = uiSystem.getSkin();
         Table root = uiSystem.getRootTable();
-        Table toolBar = new Table();
-        toolBar.top().right().padTop(10).padRight(10);
 
-        // Add buttons in order, aligned right
-        toolBar.add(new TextButton("Entity Tools", uiSystem.getSkin())).pad(5);
-        toolBar.add(new TextButton("Prop Tools", uiSystem.getSkin())).pad(5);
-        toolBar.add(new TextButton("Animation Tools", uiSystem.getSkin())).pad(5);
-        toolBar.add(new TextButton("Pixel Tools", uiSystem.getSkin())).pad(5);
-        toolBar.add(new TextButton("Region Tools", uiSystem.getSkin())).pad(5);
-        toolBar.add(new TextButton("Structure Tools", uiSystem.getSkin())).pad(5);
+        // Top bar container
+        Table topBar = new Table();
+        topBar.setBackground(skin.newDrawable("white", 1f, 1f, 1f, 1f));
+        topBar.right();
+        topBar.setHeight(height);
 
-        root.add(toolBar).expand().top().right().row();
+        // Right-side tools dropdown
+        SelectBox<ToolType> toolsDropdown = new SelectBox<>(skin);
+        toolsDropdown.setItems(ToolType.values());
+        toolsDropdown.setSelected(ToolType.fromLabel("Block Editor"));
+
+        toolsDropdown.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ToolType selected = toolsDropdown.getSelected();
+                uiSystem.ActivateEditor(selected);
+            }
+        });
+
+        topBar.add(toolsDropdown).pad(5).right();
+
+        // Add the top bar to the stage
+        root.add(topBar).expandX().top().fillX().height(height).row();
+        root.add().expand().fill();
+
+        // Set the default editor type
+        toolsDropdown.setSelected(ToolType.BLOCK);
+        uiSystem.ActivateEditor(ToolType.BLOCK);
     }
 }

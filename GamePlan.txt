@@ -5,59 +5,56 @@
 |    -- ToolManager.java
 |    {
 |
-|        --- InputSystem.java
-|        --- Worldbuilder.java "Will handle changing the actual (Pixels)"
-|
-|________/DisplaySystem
-|        --- DisplaySystem.java
-|        {
-|            ---- EntityEditor.java "Will need to be capable of editing vertices and textures and save them to json and png"
-|            ---- PropEditor.java "Will need to be capable of editing vertices and textures and save them to json and png"
-|            ---- AnimationEditor.java
-|            ---- PixelEditor.java "Will have tools to change regions and heights. Shows a grid of all"
-|            ---- RegionEditor.java
-|            ---- StructureEditor.java
-|        }
-|
 |________/UISystem
 |        --- UISystem.java
 |        {
 |            ---- ToolBar.java
 |            ---- ToolPanel.java
-|                {
-|                   ----- EntityTools.java
-|                   ----- PropTools.java
-|                   ----- AnimationTools.java
-|                   ----- PixelTools.java
-|                   ----- RegionTools.java
-|                   ----- StructureTools.java
-|                }
+|            {
+|                 ----- BlockTools.java
+|                 ----- PropTools.java
+|                 ----- ItemTools.java
+|                 ----- EntityTools.java
+|                 ----- AnimationTools.java
+|                 ----- StructureTools.java
+|                 ----- RegionTools.java
+|                 ----- WorldTools.java
+|            }
+|        }
+|
+|________/DisplaySystem
+|        --- DisplaySystem.java
+|        {
+|            ---- BlockEditor.java
+|            ---- PropEditor.java
+|            ---- ItemEditor.java
+|            ---- EntityEditor.java
+|            ---- AnimationEditor.java
+|            ---- StructureEditor.java
+|            ---- RegionEditor.java
+|            ---- WorldEditor.java
 |        }
 |
 |________/SaveSystem
 |        --- SaveSystem.java
-|         {
-|            ---- SaveEntity.java
-|            ---- SaveProp.java "Props will basically override regular Block classes vert, uv and triangle data and everything else"
+|        {
+|            ---- SaveBlocks.java
+|            ---- SaveProps.java
+|            ---- SaveItems.java
+|            ---- SaveEntities.java
 |            ---- SaveAnimation.java
-|            ---- SavePixels.java "Structure is outlines below"
-|            ---- SaveRegions.java "Regions  will need to have structures possible that spawn as well as sub regions"
-|            ---- SaveStructures.java "Structures will be anything from trees to buildings"
-|         }
+|            ---- SaveStructures.java
+|            ---- SaveRegion.java
+|            ---- SaveWorld.java
+|        }
+|
+|________/ImageSystem
+|        --- ImageSystem.java
+|        {
+|            ---- LoadPNG.java
+|            ---- SavePNG.java
+|        }
 |
 |    }
 |
 |}
-
-"SavePixels will save each PixelData as it's own json file."
-
-PixelData class
-{
-    Dictionary <Vector2, SubPixelData>
-}
-
-SubPixelData class "Will represent a single chunk"
-{
-    RegionID
-    Height
-}

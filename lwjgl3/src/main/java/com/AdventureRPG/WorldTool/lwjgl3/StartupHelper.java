@@ -14,7 +14,7 @@
  */
 //Note, the above license and copyright applies to this file only.
 
-package com.WorldTool.lwjgl3;
+package com.AdventureRPG.WorldTool.lwjgl3;
 
 import com.badlogic.gdx.Version;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3NativesLoader;

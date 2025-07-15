@@ -1,17 +1,26 @@
 package com.WorldTool;
 
+import java.util.Map;
+
+import com.WorldTool.DisplaySystem.DisplaySystem;
+import com.WorldTool.SaveSystem.SaveSystem;
 import com.WorldTool.UISystem.UISystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import java.awt.image.BufferedImage;
 
 public class ToolManager implements Screen {
 
     private UISystem uiSystem;
+    private DisplaySystem displaySystem;
+    private SaveSystem saveSystem;
 
     @Override
     public void show() {
-        uiSystem = new UISystem();
+        displaySystem = new DisplaySystem();
+        uiSystem = new UISystem(this);
+        saveSystem = new SaveSystem();
     }
 
     @Override
@@ -19,11 +28,13 @@ public class ToolManager implements Screen {
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        uiSystem.render(); // Draw UI system (includes toolbar)
+        displaySystem.render(delta);
+        uiSystem.render();
     }
 
     @Override
     public void resize(int width, int height) {
+        displaySystem.resize(width, height);
         uiSystem.resize(width, height);
     }
 
@@ -38,6 +49,38 @@ public class ToolManager implements Screen {
 
     @Override
     public void dispose() {
+        displaySystem.dispose();
         uiSystem.dispose();
+    }
+
+    public void ActivateEditor(ToolType toolType) {
+        System.out.println("[DEBUG] " + toolType.getLabel() + " initialized.");
+        displaySystem.setEditor(toolType);
+    }
+
+    // Save System \\
+
+    // Blocks \\
+
+    public void SaveBlocks(Block block) {
+        saveSystem.SaveBlocks(block);
+    }
+
+    public Block LoadBlock (int id) {
+        return saveSystem.LoadBlock(id);
+    }
+
+    public Map<Integer, Block> LoadAllBlocks() {
+        return saveSystem.LoadAllBlocks();
+    }
+
+    // PNG \\
+
+    public void SaveImage(int id, BufferedImage input) {
+        saveSystem.SaveImage(id, input);
+    }
+
+    public BufferedImage LoadImage(int id) {
+        return saveSystem.LoadImage(id);
     }
 }

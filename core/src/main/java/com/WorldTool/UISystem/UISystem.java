@@ -1,17 +1,29 @@
 package com.WorldTool.UISystem;
 
+import java.util.Map;
+
+import com.WorldTool.Block;
+import com.WorldTool.ToolManager;
+import com.WorldTool.ToolType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import java.awt.image.BufferedImage;
 
 public class UISystem {
+    private final ToolManager tooleManager;
     private final Stage stage;
     private final Skin skin;
     private final Table rootTable;
 
-    public UISystem() {
+    private ToolPanel toolPanel;
+
+    private float ToolBarHeight = 20f;
+
+    public UISystem(ToolManager base) {
+        tooleManager = base;
         stage = new Stage(new ScreenViewport());
         System.out.println(Gdx.files.internal("uiskin.json").file().getAbsolutePath());
 
@@ -21,6 +33,13 @@ public class UISystem {
 
         stage.addActor(rootTable);
         Gdx.input.setInputProcessor(stage);
+
+        setupUI();
+    }
+
+    private void setupUI() {
+        toolPanel = new ToolPanel(this, ToolBarHeight);
+        new ToolBar(this, ToolBarHeight);
     }
 
     public Stage getStage() {
@@ -47,5 +66,36 @@ public class UISystem {
     public void dispose() {
         stage.dispose();
         skin.dispose();
+    }
+
+    public void ActivateEditor(ToolType type) {
+        tooleManager.ActivateEditor(type);
+        toolPanel.SwitchTools(type);
+    }
+
+    // Save System \\
+
+    // Blocks \\
+
+    public void SaveBlocks(Block block) {
+        tooleManager.SaveBlocks(block);
+    }
+
+    public Block LoadBlock (int ID) {
+        return tooleManager.LoadBlock(ID);
+    }
+
+    public Map<Integer, Block> LoadAllBlocks() {
+        return tooleManager.LoadAllBlocks();
+    }
+
+    // PNG \\
+
+    public void SaveImage(int id, BufferedImage input) {
+        tooleManager.SaveImage(id, input);
+    }
+
+    public BufferedImage LoadImage(int id) {
+        return tooleManager.LoadImage(id);
     }
 }
