@@ -1,6 +1,9 @@
 package com.WorldTool.DisplaySystem;
 
+import java.awt.image.BufferedImage;
+
 import com.WorldTool.DisplaySystem.EditorTools.SimpleCubeRenderer;
+import com.WorldTool.ImageSystem.BlockEditorTools;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,12 +11,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import java.awt.image.BufferedImage;
-
 public class BlockEditor implements Editor {
 
-    private SimpleCubeRenderer cube;
-    private Vector2 cubePosition = new Vector2(250, 75);
+    private final SimpleCubeRenderer cube;
+    private final BlockEditorTools imageTools;
+    private final Vector2 cubePosition = new Vector2(250, 75);
 
     private int topID = 0;
     private int sideID = 0;
@@ -28,13 +30,16 @@ public class BlockEditor implements Editor {
     public BlockEditor(DisplaySystem input) {
         this.displaySystem = input;
         this.cube = new SimpleCubeRenderer(cubePosition);
+        this.imageTools = new BlockEditorTools();
 
         SetTextureIds(0, 0, 0);
+        imageTools.SetImages(topTex, sideTex, topTex);
     }
 
     @Override
     public void render(SpriteBatch batch, float delta) {
         cube.render(delta);
+        imageTools.drawAllImages(true);
     }
 
     @Override

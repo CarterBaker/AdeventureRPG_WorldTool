@@ -1,5 +1,6 @@
 package com.WorldTool;
 
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import com.WorldTool.DisplaySystem.DisplaySystem;
@@ -8,7 +9,6 @@ import com.WorldTool.UISystem.UISystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import java.awt.image.BufferedImage;
 
 public class ToolManager implements Screen {
 
