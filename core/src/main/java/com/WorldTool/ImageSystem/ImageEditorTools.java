@@ -23,6 +23,10 @@ public class ImageEditorTools {
     private final Map<Integer, Texture> cachedTextures = new HashMap<>();
     private final Set<Integer> drawnIds = new HashSet<>();
 
+    private int drawnCount = 0;
+    private final float fixedScreenSpacing = 10f;
+    private final Map<Integer, Vector2> imageWorldPositions = new HashMap<>();
+
     private final OrthographicCamera camera;
 
     private boolean dragging = false;
@@ -58,6 +62,7 @@ public class ImageEditorTools {
 
     public void resetDrawnIds() {
         drawnIds.clear();
+        drawnCount = 0;
     }
 
     private void updateCamera() {
@@ -86,10 +91,9 @@ public class ImageEditorTools {
             setZoom(zoom - 0.1f);
     }
 
-    public int[][] drawEditableImage(int id, int[][] inputData, Vector2 position, boolean handleInput, int inputColor) {
+    public int[][] drawEditableImage(int id, int[][] inputData, boolean handleInput, int inputColor) {
         // Initialize shared pixel data if not present
         if (!sharedPixelData.containsKey(id)) {
-            // Copy inputData deeply to avoid aliasing
             int height = inputData.length;
             int width = inputData[0].length;
             int[][] copy = new int[height][width];
@@ -104,11 +108,26 @@ public class ImageEditorTools {
         int height = pixels.length;
         int width = pixels[0].length;
 
-        // Handle painting input on shared pixel data
+        float spacingWorld = fixedScreenSpacing * zoom;
+
+        // Assign fixed world position if not already done
+        if (!imageWorldPositions.containsKey(id)) {
+            float imageWorldWidth = width * zoom;
+            float x = drawnCount * (imageWorldWidth + spacingWorld);
+            float y = 0; // Adjust this Y anchor if you want vertical spacing or centering
+            imageWorldPositions.put(id, new Vector2(x, y));
+        }
+
+        // Use stored world position
+        Vector2 drawPos = imageWorldPositions.get(id);
+        float drawX = drawPos.x;
+        float drawY = drawPos.y;
+
+        // Handle input painting
         if (handleInput && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             Vector3 worldCoords = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            int px = (int) ((worldCoords.x - position.x) / zoom);
-            int py = (int) ((worldCoords.y - position.y) / zoom);
+            int px = (int) ((worldCoords.x - drawX) / zoom);
+            int py = (int) ((worldCoords.y - drawY) / zoom);
 
             if (px >= 0 && py >= 0 && px < width && py < height) {
                 pixels[height - 1 - py][px] = inputColor;
@@ -116,18 +135,18 @@ public class ImageEditorTools {
             }
         }
 
-        // Draw texture once per ID per frame
+        // Draw texture once per frame per ID
         if (!drawnIds.contains(id)) {
             Texture tex = cachedTextures.get(id);
             if (tex != null) {
                 localBatch.begin();
-                localBatch.draw(tex, position.x, position.y, tex.getWidth() * zoom, tex.getHeight() * zoom);
+                localBatch.draw(tex, drawX, drawY, tex.getWidth() * zoom, tex.getHeight() * zoom);
                 localBatch.end();
             }
             drawnIds.add(id);
+            drawnCount++;
         }
 
-        // Return the shared pixel data for this ID
         return pixels;
     }
 
