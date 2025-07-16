@@ -2,6 +2,8 @@ package com.WorldTool.ImageSystem;
 
 import java.awt.image.BufferedImage;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 public class ImageSystem {
 
     private String path;
@@ -36,5 +38,9 @@ public class ImageSystem {
 
     public BufferedImage fromARGBArray(int[][] input) {
         return imageConverter.fromARGBArray(input);
+    }
+
+    public TextureRegion convertToTextureRegion(int[][] input) {
+        return imageConverter.convertToTextureRegion(input);
     }
 }

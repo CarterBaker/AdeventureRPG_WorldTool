@@ -120,25 +120,37 @@ public class SimpleCubeRenderer {
 
         public void setTopFace(TextureRegion texture) {
                 this.topFace = texture;
-                if (faceMaterials[0] != null && texture != null) {
-                        faceMaterials[0].set(TextureAttribute.createDiffuse(texture.getTexture()));
-                }
+                updateMaterialTexture(0, texture);
         }
 
         public void setBottomFace(TextureRegion texture) {
                 this.bottomFace = texture;
-                if (faceMaterials[1] != null && texture != null) {
-                        faceMaterials[1].set(TextureAttribute.createDiffuse(texture.getTexture()));
-                }
+                updateMaterialTexture(1, texture);
         }
 
         public void setSideFace(int index, TextureRegion texture) {
                 if (index >= 0 && index < 4) {
                         sideFaces[index] = texture;
-                        if (faceMaterials[index + 2] != null && texture != null) {
-                                faceMaterials[index + 2].set(TextureAttribute.createDiffuse(texture.getTexture()));
-                        }
+                        updateMaterialTexture(index + 2, texture);
                 }
+        }
+
+        private void updateMaterialTexture(int faceIndex, TextureRegion textureRegion) {
+                if (textureRegion == null)
+                        return;
+
+                // Update the reference
+                if (faceIndex == 0)
+                        topFace = textureRegion;
+                else if (faceIndex == 1)
+                        bottomFace = textureRegion;
+                else if (faceIndex >= 2 && faceIndex < 6)
+                        sideFaces[faceIndex - 2] = textureRegion;
+
+                // Force rebuild
+                dispose(); // Clean up old model
+                built = false;
+                buildCube();
         }
 
         public void buildCube() {

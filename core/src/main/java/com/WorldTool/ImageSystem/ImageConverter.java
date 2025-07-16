@@ -2,6 +2,11 @@ package com.WorldTool.ImageSystem;
 
 import java.awt.image.BufferedImage;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 public class ImageConverter {
 
     // Converts BufferedImage to a 2D array of ARGB values
@@ -31,4 +36,31 @@ public class ImageConverter {
         }
         return image;
     }
+
+    public TextureRegion convertToTextureRegion(int[][] argbData) {
+        int height = argbData.length;
+        int width = argbData[0].length;
+
+        Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int argb = argbData[y][x];
+                int a = (argb >> 24) & 0xff;
+                int r = (argb >> 16) & 0xff;
+                int g = (argb >> 8) & 0xff;
+                int b = argb & 0xff;
+
+                int rgba = (r << 24) | (g << 16) | (b << 8) | a;
+                pixmap.drawPixel(x, y, rgba);
+            }
+        }
+
+        Texture texture = new Texture(pixmap);
+        TextureRegion region = new TextureRegion(texture);
+        pixmap.dispose();
+
+        return region;
+    }
+
 }

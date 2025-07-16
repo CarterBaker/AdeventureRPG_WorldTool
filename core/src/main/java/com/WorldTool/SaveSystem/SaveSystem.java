@@ -1,27 +1,27 @@
 package com.WorldTool.SaveSystem;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import com.WorldTool.Block;
 import com.WorldTool.ImageSystem.ImageSystem;
-import java.awt.image.BufferedImage;
-
-import java.util.Map;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class SaveSystem {
 
-    private String path;
+    private final String path;
 
-    private SaveBlocks blocks;
-    private SaveProps props;
-    private SaveItems items;
-    private SaveEntities entities;
-    private SaveAnimations animations;
-    private SaveStructures structures;
-    private SaveRegions regions;
-    private SaveWorld world;
+    private final SaveBlocks blocks;
+    private final SaveProps props;
+    private final SaveItems items;
+    private final SaveEntities entities;
+    private final SaveAnimations animations;
+    private final SaveStructures structures;
+    private final SaveRegions regions;
+    private final SaveWorld world;
 
-    private ImageSystem image;
+    private final ImageSystem image;
 
     public SaveSystem() {
 
@@ -46,7 +46,7 @@ public class SaveSystem {
         blocks.Save(block);
     }
 
-    public Block LoadBlock (int ID) {
+    public Block LoadBlock(int ID) {
         return blocks.Load(ID);
     }
 
@@ -102,5 +102,9 @@ public class SaveSystem {
 
     public BufferedImage fromARGBArray(int[][] argbArray) {
         return image.fromARGBArray(argbArray);
+    }
+
+    public TextureRegion convertToTextureRegion(int[][] input) {
+        return image.convertToTextureRegion(input);
     }
 }

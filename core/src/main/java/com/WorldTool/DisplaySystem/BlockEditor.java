@@ -4,14 +4,12 @@ import java.awt.image.BufferedImage;
 
 import com.WorldTool.DisplaySystem.EditorTools.SimpleCubeRenderer;
 import com.WorldTool.ImageSystem.BlockEditorTools;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 public class BlockEditor implements Editor {
+
+    private final DisplaySystem displaySystem;
 
     private final SimpleCubeRenderer cube;
     private final BlockEditorTools imageTools;
@@ -25,21 +23,19 @@ public class BlockEditor implements Editor {
     private int[][] sideTex;
     private int[][] bottomTex;
 
-    private final DisplaySystem displaySystem;
-
     public BlockEditor(DisplaySystem input) {
         this.displaySystem = input;
         this.cube = new SimpleCubeRenderer(cubePosition);
         this.imageTools = new BlockEditorTools();
 
         SetTextureIds(0, 0, 0);
-        imageTools.SetImages(topTex, sideTex, topTex);
     }
 
     @Override
     public void render(SpriteBatch batch, float delta) {
         cube.render(delta);
-        imageTools.drawAllImages(true);
+
+        UpdateCurrentTextures();
     }
 
     @Override
@@ -104,40 +100,22 @@ public class BlockEditor implements Editor {
         bottomTex = data;
     }
 
-    public void updateCubeTexturesFromData() {
-        cube.setTopFace(convertToTextureRegion(topTex));
-        cube.setSideFace(0, convertToTextureRegion(sideTex)); // All 4 sides use same face for now
-        cube.setSideFace(1, convertToTextureRegion(sideTex));
-        cube.setSideFace(2, convertToTextureRegion(sideTex));
-        cube.setSideFace(3, convertToTextureRegion(sideTex));
-        cube.setBottomFace(convertToTextureRegion(bottomTex));
+    public void UpdateCurrentTextures() {
+        topTex = imageTools.drawTopImage(topTex, true);
+        sideTex = imageTools.drawSideImage(sideTex, true);
+        bottomTex = imageTools.drawBottomImage(bottomTex, true);
 
-        cube.buildCube(); // Ensure it's built once
+        updateCubeTexturesFromData();
     }
 
-    private TextureRegion convertToTextureRegion(int[][] argbData) {
-        int width = argbData.length;
-        int height = argbData[0].length;
+    public void updateCubeTexturesFromData() {
+        cube.setTopFace(displaySystem.convertToTextureRegion(topTex));
+        cube.setSideFace(0, displaySystem.convertToTextureRegion(sideTex));
+        cube.setSideFace(1, displaySystem.convertToTextureRegion(sideTex));
+        cube.setSideFace(2, displaySystem.convertToTextureRegion(sideTex));
+        cube.setSideFace(3, displaySystem.convertToTextureRegion(sideTex));
+        cube.setBottomFace(displaySystem.convertToTextureRegion(bottomTex));
 
-        Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int argb = argbData[x][y];
-                int a = (argb >> 24) & 0xff;
-                int r = (argb >> 16) & 0xff;
-                int g = (argb >> 8) & 0xff;
-                int b = (argb) & 0xff;
-
-                int rgba = (a << 24) | (r << 16) | (g << 8) | b; // ✅ Correct order
-                pixmap.drawPixel(x, y, rgba);
-            }
-        }
-
-        Texture texture = new Texture(pixmap);
-        TextureRegion region = new TextureRegion(texture);
-        pixmap.dispose();
-
-        return region;
+        cube.buildCube(); // Ensure it's built once
     }
 }

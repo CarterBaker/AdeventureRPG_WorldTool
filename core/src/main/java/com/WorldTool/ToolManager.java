@@ -9,6 +9,7 @@ import com.WorldTool.UISystem.UISystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class ToolManager implements Screen {
 
@@ -95,5 +96,9 @@ public class ToolManager implements Screen {
 
     public BufferedImage fromARGBArray(int[][] argbArray) {
         return saveSystem.fromARGBArray(argbArray);
+    }
+
+    public TextureRegion convertToTextureRegion(int[][] input) {
+        return saveSystem.convertToTextureRegion(input);
     }
 }

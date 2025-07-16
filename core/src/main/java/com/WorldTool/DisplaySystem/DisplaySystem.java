@@ -1,25 +1,27 @@
 package com.WorldTool.DisplaySystem;
 
 import java.awt.image.BufferedImage;
+
 import com.WorldTool.Block;
 import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class DisplaySystem {
 
-    private ToolManager toolManager;
+    private final ToolManager toolManager;
 
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
 
-    private BlockEditor blockEditor;
-    private PropEditor propEditor;
-    private ItemEditor itemEditor;
-    private EntityEditor entityEditor;
-    private AnimationEditor animationEditor;
-    private StructureEditor structureEditor;
-    private RegionEditor regionEditor;
-    private WorldEditor worldEditor;
+    private final BlockEditor blockEditor;
+    private final PropEditor propEditor;
+    private final ItemEditor itemEditor;
+    private final EntityEditor entityEditor;
+    private final AnimationEditor animationEditor;
+    private final StructureEditor structureEditor;
+    private final RegionEditor regionEditor;
+    private final WorldEditor worldEditor;
 
     private Editor currentEditor;
 
@@ -50,15 +52,32 @@ public class DisplaySystem {
 
     public void setEditor(ToolType toolType) {
         switch (toolType) {
-            case BLOCK: currentEditor = blockEditor; break;
-            case PROP: currentEditor = propEditor; break;
-            case ITEM: currentEditor = itemEditor; break;
-            case ENTITY: currentEditor = entityEditor; break;
-            case ANIMATION: currentEditor = animationEditor; break;
-            case STRUCTURE: currentEditor = structureEditor; break;
-            case REGION: currentEditor = regionEditor; break;
-            case WORLD: currentEditor = worldEditor; break;
-            default: currentEditor = null;
+            case BLOCK:
+                currentEditor = blockEditor;
+                break;
+            case PROP:
+                currentEditor = propEditor;
+                break;
+            case ITEM:
+                currentEditor = itemEditor;
+                break;
+            case ENTITY:
+                currentEditor = entityEditor;
+                break;
+            case ANIMATION:
+                currentEditor = animationEditor;
+                break;
+            case STRUCTURE:
+                currentEditor = structureEditor;
+                break;
+            case REGION:
+                currentEditor = regionEditor;
+                break;
+            case WORLD:
+                currentEditor = worldEditor;
+                break;
+            default:
+                currentEditor = null;
         }
     }
 
@@ -80,7 +99,7 @@ public class DisplaySystem {
         toolManager.SaveBlocks(block);
     }
 
-    public Block LoadBlock (int id) {
+    public Block LoadBlock(int id) {
         return toolManager.LoadBlock(id);
     }
 
@@ -93,7 +112,7 @@ public class DisplaySystem {
     public BufferedImage LoadImage(int id) {
         return toolManager.LoadImage(id);
     }
-        
+
     // Conversion \\
 
     public int[][] toARGBArray(BufferedImage input) {
@@ -102,5 +121,9 @@ public class DisplaySystem {
 
     public BufferedImage fromARGBArray(int[][] argbArray) {
         return toolManager.fromARGBArray(argbArray);
+    }
+
+    public TextureRegion convertToTextureRegion(int[][] input) {
+        return toolManager.convertToTextureRegion(input);
     }
 }

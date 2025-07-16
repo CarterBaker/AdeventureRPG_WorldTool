@@ -6,10 +6,6 @@ public class BlockEditorTools {
 
     private final ImageEditorTools editingTools;
 
-    private int[][] topTex;
-    private int[][] sideTex;
-    private int[][] bottomTex;
-
     private final Vector2 topPosition = new Vector2(50, 400); // Adjust Y as needed
     private final Vector2 sidePosition = new Vector2(150, 400); // X offset by +100
     private final Vector2 bottomPosition = new Vector2(250, 400); // X offset by +100 again
@@ -18,23 +14,18 @@ public class BlockEditorTools {
         this.editingTools = new ImageEditorTools();
     }
 
-    public void SetImages(int[][] tI, int[][] sI, int[][] bI) {
-        topTex = tI;
-        sideTex = sI;
-        bottomTex = bI;
+    public int[][] drawTopImage(int[][] input, boolean handleInput) {
+        input = editingTools.drawEditableImage(input, topPosition, handleInput);
+        return input;
     }
 
-    public void drawAllImages(boolean handleInput) {
-        if (topTex != null) {
-            editingTools.drawEditableImage(topTex, topPosition, handleInput);
-        }
+    public int[][] drawSideImage(int[][] input, boolean handleInput) {
+        input = editingTools.drawEditableImage(input, sidePosition, handleInput);
+        return input;
+    }
 
-        if (sideTex != null) {
-            editingTools.drawEditableImage(sideTex, sidePosition, handleInput);
-        }
-
-        if (bottomTex != null) {
-            editingTools.drawEditableImage(bottomTex, bottomPosition, handleInput);
-        }
+    public int[][] drawBottomImage(int[][] input, boolean handleInput) {
+        input = editingTools.drawEditableImage(input, bottomPosition, handleInput);
+        return input;
     }
 }

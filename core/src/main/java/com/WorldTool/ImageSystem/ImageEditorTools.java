@@ -68,7 +68,7 @@ public class ImageEditorTools {
     /**
      * Draws an editable image to the screen using an internally managed camera.
      */
-    public void drawEditableImage(int[][] argbData, Vector2 position, boolean handleInput) {
+    public int[][] drawEditableImage(int[][] argbData, Vector2 position, boolean handleInput) {
         updateCamera();
         camera.update();
         localBatch.setProjectionMatrix(camera.combined);
@@ -103,6 +103,8 @@ public class ImageEditorTools {
                 rebuildTexture(argbData);
             }
         }
+
+        return argbData;
     }
 
     /**
@@ -121,12 +123,13 @@ public class ImageEditorTools {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int argb = argbData[y][x];
-                int a = (argb >> 24) & 0xff;
                 int r = (argb >> 16) & 0xff;
                 int g = (argb >> 8) & 0xff;
-                int b = (argb) & 0xff;
+                int b = argb & 0xff;
+                int a = (argb >> 24) & 0xff;
 
-                int rgba = (a << 24) | (r << 16) | (g << 8) | b;
+                // LibGDX expects RGBA in little-endian byte order
+                int rgba = (r << 24) | (g << 16) | (b << 8) | a;
                 pixmap.drawPixel(x, y, rgba);
             }
         }
