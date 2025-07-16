@@ -51,7 +51,8 @@ public class ToolPanel extends Table {
         // Optional: resize listener if you want dynamic resizing
         uiSystem.getStage().addListener(new com.badlogic.gdx.scenes.scene2d.InputListener() {
             @Override
-            public boolean scrolled(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y, float amountX, float amountY) {
+            public boolean scrolled(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y, float amountX,
+                    float amountY) {
                 updateSizeAndPosition();
                 return false;
             }
@@ -73,7 +74,8 @@ public class ToolPanel extends Table {
 
     @Override
     protected void finalize() throws Throwable {
-        if (backgroundTexture != null) backgroundTexture.dispose();
+        if (backgroundTexture != null)
+            backgroundTexture.dispose();
     }
 
     public void SwitchTools(ToolType type) {
@@ -89,34 +91,47 @@ public class ToolPanel extends Table {
 
     private ToolProvider getToolProvider(ToolType type) {
         switch (type) {
-            case BLOCK: return new BlockTools();
-            case PROP: return new PropTools();
-            case ITEM: return new ItemTools();
-            case ENTITY: return new EntityTools();
-            case ANIMATION: return new AnimationTools();
-            case STRUCTURE: return new StructureTools();
-            case REGION: return new RegionTools();
-            case WORLD: return new WorldTools();
-            default: return null;
+            case BLOCK:
+                return new BlockTools(this);
+            case PROP:
+                return new PropTools();
+            case ITEM:
+                return new ItemTools();
+            case ENTITY:
+                return new EntityTools();
+            case ANIMATION:
+                return new AnimationTools();
+            case STRUCTURE:
+                return new StructureTools();
+            case REGION:
+                return new RegionTools();
+            case WORLD:
+                return new WorldTools();
+            default:
+                return null;
         }
     }
 
-    // Save System \\
+    // References \\
 
     // Blocks \\
+
+    public void SetTextureIds(int top, int side, int bottom) {
+        uiSystem.SetTextureIds(top, side, bottom);
+    }
 
     public void SaveBlocks(Block block) {
         uiSystem.SaveBlocks(block);
     }
 
-    public Block LoadBlock (int ID) {
+    public Block LoadBlock(int ID) {
         return uiSystem.LoadBlock(ID);
     }
 
     public Map<Integer, Block> LoadAllBlocks() {
         return uiSystem.LoadAllBlocks();
     }
-    
+
     // PNG \\
 
     public void SaveImage(int id, BufferedImage input) {

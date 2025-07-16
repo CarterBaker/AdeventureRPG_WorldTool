@@ -31,32 +31,36 @@ public class ImageEditorTools {
 
     private boolean dragging = false;
     private final Vector2 dragStart = new Vector2();
-    private float zoom = 1.0f; // Zoom factor
+    private float pixelSize = 20.0f; // World units per image pixel
 
     public ImageEditorTools() {
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.setToOrtho(false);
         camera.update();
 
-        localBatch = new SpriteBatch(); // Own SpriteBatch
+        localBatch = new SpriteBatch();
     }
 
     public void setZoom(float newZoom) {
-        // Clamp zoom level between 0.1 and 20
-        zoom = Math.max(0.1f, Math.min(newZoom, 20f));
+        // Clamp pixel size (not camera.zoom)
+        pixelSize = Math.max(1f, Math.min(newZoom, 100f));
     }
 
     public float getZoom() {
-        return zoom;
+        return pixelSize;
     }
 
     public void render(float delta, boolean isDragging) {
         if (!isDragging)
             updateCamera();
 
+        // Resize-aware camera update
+        if (camera.viewportWidth != Gdx.graphics.getWidth() || camera.viewportHeight != Gdx.graphics.getHeight()) {
+            camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
+
         camera.update();
         localBatch.setProjectionMatrix(camera.combined);
-
         resetDrawnIds();
     }
 
@@ -66,33 +70,28 @@ public class ImageEditorTools {
     }
 
     private void updateCamera() {
-        // Existing panning logic (unchanged)
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             dragging = true;
             dragStart.set(Gdx.input.getX(), Gdx.input.getY());
-        } else if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT))
+        } else if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             dragging = false;
+        }
 
         if (dragging) {
             Vector2 current = new Vector2(Gdx.input.getX(), Gdx.input.getY());
             Vector2 delta = new Vector2(current).sub(dragStart);
-
             camera.translate(-delta.x * camera.zoom, delta.y * camera.zoom);
             camera.update();
-
             dragStart.set(current);
         }
 
-        // Optional: Zoom with keyboard for demo
         if (Gdx.input.isKeyJustPressed(Input.Keys.PLUS) || Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
-            setZoom(zoom + 0.1f);
-
+            setZoom(pixelSize + 1f);
         if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
-            setZoom(zoom - 0.1f);
+            setZoom(pixelSize - 1f);
     }
 
     public int[][] drawEditableImage(int id, int[][] inputData, boolean handleInput, int inputColor) {
-        // Initialize shared pixel data if not present
         if (!sharedPixelData.containsKey(id)) {
             int height = inputData.length;
             int width = inputData[0].length;
@@ -108,26 +107,23 @@ public class ImageEditorTools {
         int height = pixels.length;
         int width = pixels[0].length;
 
-        float spacingWorld = fixedScreenSpacing * zoom;
+        float spacingWorld = fixedScreenSpacing * pixelSize;
 
-        // Assign fixed world position if not already done
         if (!imageWorldPositions.containsKey(id)) {
-            float imageWorldWidth = width * zoom;
+            float imageWorldWidth = width * pixelSize;
             float x = drawnCount * (imageWorldWidth + spacingWorld);
-            float y = 0; // Adjust this Y anchor if you want vertical spacing or centering
+            float y = 0;
             imageWorldPositions.put(id, new Vector2(x, y));
         }
 
-        // Use stored world position
         Vector2 drawPos = imageWorldPositions.get(id);
         float drawX = drawPos.x;
         float drawY = drawPos.y;
 
-        // Handle input painting
         if (handleInput && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             Vector3 worldCoords = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            int px = (int) ((worldCoords.x - drawX) / zoom);
-            int py = (int) ((worldCoords.y - drawY) / zoom);
+            int px = (int) ((worldCoords.x - drawX) / pixelSize);
+            int py = (int) ((worldCoords.y - drawY) / pixelSize);
 
             if (px >= 0 && py >= 0 && px < width && py < height) {
                 pixels[height - 1 - py][px] = inputColor;
@@ -135,12 +131,14 @@ public class ImageEditorTools {
             }
         }
 
-        // Draw texture once per frame per ID
         if (!drawnIds.contains(id)) {
             Texture tex = cachedTextures.get(id);
             if (tex != null) {
+                float drawWidth = tex.getWidth() * pixelSize;
+                float drawHeight = tex.getHeight() * pixelSize;
+
                 localBatch.begin();
-                localBatch.draw(tex, drawX, drawY, tex.getWidth() * zoom, tex.getHeight() * zoom);
+                localBatch.draw(tex, drawX, drawY, drawWidth, drawHeight);
                 localBatch.end();
             }
             drawnIds.add(id);
@@ -157,7 +155,6 @@ public class ImageEditorTools {
 
         int height = pixels.length;
         int width = pixels[0].length;
-
         Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
 
         for (int y = 0; y < height; y++) {
@@ -175,5 +172,4 @@ public class ImageEditorTools {
         cachedTextures.put(id, new Texture(pixmap));
         pixmap.dispose();
     }
-
 }

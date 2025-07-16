@@ -51,34 +51,17 @@ public class DisplaySystem {
     }
 
     public void setEditor(ToolType toolType) {
-        switch (toolType) {
-            case BLOCK:
-                currentEditor = blockEditor;
-                break;
-            case PROP:
-                currentEditor = propEditor;
-                break;
-            case ITEM:
-                currentEditor = itemEditor;
-                break;
-            case ENTITY:
-                currentEditor = entityEditor;
-                break;
-            case ANIMATION:
-                currentEditor = animationEditor;
-                break;
-            case STRUCTURE:
-                currentEditor = structureEditor;
-                break;
-            case REGION:
-                currentEditor = regionEditor;
-                break;
-            case WORLD:
-                currentEditor = worldEditor;
-                break;
-            default:
-                currentEditor = null;
-        }
+        currentEditor = switch (toolType) {
+            case BLOCK -> blockEditor;
+            case PROP -> propEditor;
+            case ITEM -> itemEditor;
+            case ENTITY -> entityEditor;
+            case ANIMATION -> animationEditor;
+            case STRUCTURE -> structureEditor;
+            case REGION -> regionEditor;
+            case WORLD -> worldEditor;
+            default -> null;
+        };
     }
 
     public void resize(int width, int height) {
@@ -94,6 +77,10 @@ public class DisplaySystem {
     // Save System \\
 
     // Blocks \\
+
+    public void SetTextureIds(int top, int side, int bottom) {
+        blockEditor.SetTextureIds(top, side, bottom);
+    }
 
     public void SaveBlocks(Block block) {
         toolManager.SaveBlocks(block);

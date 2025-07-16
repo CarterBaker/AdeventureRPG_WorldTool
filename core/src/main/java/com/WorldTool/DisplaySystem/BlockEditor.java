@@ -7,7 +7,7 @@ import com.WorldTool.ImageSystem.BlockEditorTools;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
-public class BlockEditor implements Editor {
+public final class BlockEditor implements Editor {
 
     private final DisplaySystem displaySystem;
 
@@ -50,7 +50,7 @@ public class BlockEditor implements Editor {
         brushColor = input;
     }
 
-    private void SetTextureIds(int top, int side, int bottom) {
+    public void SetTextureIds(int top, int side, int bottom) {
         topID = top;
         sideID = side;
         bottomID = bottom;

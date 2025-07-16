@@ -1,5 +1,6 @@
 package com.WorldTool.UISystem;
 
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import com.WorldTool.Block;
@@ -10,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import java.awt.image.BufferedImage;
 
 public class UISystem {
     private final ToolManager tooleManager;
@@ -73,15 +73,19 @@ public class UISystem {
         toolPanel.SwitchTools(type);
     }
 
-    // Save System \\
+    // References \\
 
     // Blocks \\
+
+    public void SetTextureIds(int top, int side, int bottom) {
+        tooleManager.SetTextureIds(top, side, bottom);
+    }
 
     public void SaveBlocks(Block block) {
         tooleManager.SaveBlocks(block);
     }
 
-    public Block LoadBlock (int ID) {
+    public Block LoadBlock(int ID) {
         return tooleManager.LoadBlock(ID);
     }
 

@@ -62,9 +62,13 @@ public class ToolManager implements Screen {
         displaySystem.setEditor(toolType);
     }
 
-    // Save System \\
+    // References \\
 
     // Blocks \\
+
+    public void SetTextureIds(int top, int side, int bottom) {
+        displaySystem.SetTextureIds(top, side, bottom);
+    }
 
     public void SaveBlocks(Block block) {
         saveSystem.SaveBlocks(block);
