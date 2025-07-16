@@ -1,5 +1,10 @@
 package com.WorldTool.ImageSystem;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,16 +19,15 @@ public class ImageEditorTools {
 
     private final SpriteBatch localBatch;
 
-    private Texture cachedTexture = null;
-    private int[][] lastData = null;
-    private int lastWidth = 0;
-    private int lastHeight = 0;
+    private final Map<Integer, int[][]> sharedPixelData = new HashMap<>();
+    private final Map<Integer, Texture> cachedTextures = new HashMap<>();
+    private final Set<Integer> drawnIds = new HashSet<>();
 
     private final OrthographicCamera camera;
-    private float zoom = 1f;
 
     private boolean dragging = false;
-    private Vector2 dragStart = new Vector2();
+    private final Vector2 dragStart = new Vector2();
+    private float zoom = 1.0f; // Zoom factor
 
     public ImageEditorTools() {
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -33,26 +37,36 @@ public class ImageEditorTools {
         localBatch = new SpriteBatch(); // Own SpriteBatch
     }
 
-    /**
-     * Updates the internal camera based on user input (zoom + pan).
-     */
-    private void updateCamera() {
-        // Handle zoom (mouse scroll)
-        int scroll = 0;
-        if (scroll != 0) {
-            zoom += scroll * 0.1f;
-            zoom = Math.max(0.1f, Math.min(zoom, 10f));
-            camera.zoom = zoom;
-            camera.update();
-        }
+    public void setZoom(float newZoom) {
+        // Clamp zoom level between 0.1 and 20
+        zoom = Math.max(0.1f, Math.min(newZoom, 20f));
+    }
 
-        // Handle panning (left mouse drag)
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void render(float delta, boolean isDragging) {
+        if (!isDragging)
+            updateCamera();
+
+        camera.update();
+        localBatch.setProjectionMatrix(camera.combined);
+
+        resetDrawnIds();
+    }
+
+    public void resetDrawnIds() {
+        drawnIds.clear();
+    }
+
+    private void updateCamera() {
+        // Existing panning logic (unchanged)
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             dragging = true;
             dragStart.set(Gdx.input.getX(), Gdx.input.getY());
-        } else if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+        } else if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT))
             dragging = false;
-        }
 
         if (dragging) {
             Vector2 current = new Vector2(Gdx.input.getX(), Gdx.input.getY());
@@ -63,78 +77,84 @@ public class ImageEditorTools {
 
             dragStart.set(current);
         }
+
+        // Optional: Zoom with keyboard for demo
+        if (Gdx.input.isKeyJustPressed(Input.Keys.PLUS) || Gdx.input.isKeyJustPressed(Input.Keys.EQUALS))
+            setZoom(zoom + 0.1f);
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.MINUS))
+            setZoom(zoom - 0.1f);
     }
 
-    /**
-     * Draws an editable image to the screen using an internally managed camera.
-     */
-    public int[][] drawEditableImage(int[][] argbData, Vector2 position, boolean handleInput) {
-        updateCamera();
-        camera.update();
-        localBatch.setProjectionMatrix(camera.combined);
-
-        int height = argbData.length;
-        int width = argbData[0].length;
-
-        // Rebuild texture if changed
-        if (argbData != lastData || width != lastWidth || height != lastHeight) {
-            rebuildTexture(argbData);
-            lastData = argbData;
-            lastWidth = width;
-            lastHeight = height;
+    public int[][] drawEditableImage(int id, int[][] inputData, Vector2 position, boolean handleInput, int inputColor) {
+        // Initialize shared pixel data if not present
+        if (!sharedPixelData.containsKey(id)) {
+            // Copy inputData deeply to avoid aliasing
+            int height = inputData.length;
+            int width = inputData[0].length;
+            int[][] copy = new int[height][width];
+            for (int y = 0; y < height; y++) {
+                System.arraycopy(inputData[y], 0, copy[y], 0, width);
+            }
+            sharedPixelData.put(id, copy);
+            rebuildTextureForId(id, copy);
         }
 
-        // Draw the image
-        if (cachedTexture != null) {
-            localBatch.begin(); // Start drawing
-            localBatch.draw(cachedTexture, position.x, position.y);
-            localBatch.end(); // End drawing
-        }
-        // Handle paint input (red pixel draw)
+        int[][] pixels = sharedPixelData.get(id);
+        int height = pixels.length;
+        int width = pixels[0].length;
+
+        // Handle painting input on shared pixel data
         if (handleInput && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             Vector3 worldCoords = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+            int px = (int) ((worldCoords.x - position.x) / zoom);
+            int py = (int) ((worldCoords.y - position.y) / zoom);
 
-            int px = (int) (worldCoords.x - position.x);
-            int py = (int) (worldCoords.y - position.y);
-
-            // Flip Y to match image coords if needed
             if (px >= 0 && py >= 0 && px < width && py < height) {
-                argbData[py][px] = 0xFFFF0000; // red with full alpha
-                rebuildTexture(argbData);
+                pixels[height - 1 - py][px] = inputColor;
+                rebuildTextureForId(id, pixels);
             }
         }
 
-        return argbData;
+        // Draw texture once per ID per frame
+        if (!drawnIds.contains(id)) {
+            Texture tex = cachedTextures.get(id);
+            if (tex != null) {
+                localBatch.begin();
+                localBatch.draw(tex, position.x, position.y, tex.getWidth() * zoom, tex.getHeight() * zoom);
+                localBatch.end();
+            }
+            drawnIds.add(id);
+        }
+
+        // Return the shared pixel data for this ID
+        return pixels;
     }
 
-    /**
-     * Rebuilds the internal Texture from ARGB data.
-     */
-    private void rebuildTexture(int[][] argbData) {
-        int height = argbData.length;
-        int width = argbData[0].length;
+    private void rebuildTextureForId(int id, int[][] pixels) {
+        Texture old = cachedTextures.get(id);
+        if (old != null)
+            old.dispose();
 
-        if (cachedTexture != null) {
-            cachedTexture.dispose();
-        }
+        int height = pixels.length;
+        int width = pixels[0].length;
 
         Pixmap pixmap = new Pixmap(width, height, Format.RGBA8888);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = argbData[y][x];
+                int argb = pixels[y][x];
                 int r = (argb >> 16) & 0xff;
                 int g = (argb >> 8) & 0xff;
                 int b = argb & 0xff;
                 int a = (argb >> 24) & 0xff;
-
-                // LibGDX expects RGBA in little-endian byte order
                 int rgba = (r << 24) | (g << 16) | (b << 8) | a;
                 pixmap.drawPixel(x, y, rgba);
             }
         }
 
-        cachedTexture = new Texture(pixmap);
+        cachedTextures.put(id, new Texture(pixmap));
         pixmap.dispose();
     }
+
 }

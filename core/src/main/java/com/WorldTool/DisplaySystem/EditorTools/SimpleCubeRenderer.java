@@ -118,6 +118,10 @@ public class SimpleCubeRenderer {
                         modelBatch.dispose();
         }
 
+        public boolean isDragging() {
+                return dragging;
+        }
+
         public void setTopFace(TextureRegion texture) {
                 this.topFace = texture;
                 updateMaterialTexture(0, texture);

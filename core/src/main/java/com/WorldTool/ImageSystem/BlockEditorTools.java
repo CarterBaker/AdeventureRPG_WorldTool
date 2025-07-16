@@ -10,22 +10,26 @@ public class BlockEditorTools {
     private final Vector2 sidePosition = new Vector2(150, 400); // X offset by +100
     private final Vector2 bottomPosition = new Vector2(250, 400); // X offset by +100 again
 
+    public void render(float delta, boolean isDragging) {
+        editingTools.render(delta, isDragging);
+    }
+
     public BlockEditorTools() {
         this.editingTools = new ImageEditorTools();
     }
 
-    public int[][] drawTopImage(int[][] input, boolean handleInput) {
-        input = editingTools.drawEditableImage(input, topPosition, handleInput);
+    public int[][] drawTopImage(int id, int[][] input, boolean handleInput, int color) {
+        input = editingTools.drawEditableImage(id, input, topPosition, handleInput, color);
         return input;
     }
 
-    public int[][] drawSideImage(int[][] input, boolean handleInput) {
-        input = editingTools.drawEditableImage(input, sidePosition, handleInput);
+    public int[][] drawSideImage(int id, int[][] input, boolean handleInput, int color) {
+        input = editingTools.drawEditableImage(id, input, sidePosition, handleInput, color);
         return input;
     }
 
-    public int[][] drawBottomImage(int[][] input, boolean handleInput) {
-        input = editingTools.drawEditableImage(input, bottomPosition, handleInput);
+    public int[][] drawBottomImage(int id, int[][] input, boolean handleInput, int color) {
+        input = editingTools.drawEditableImage(id, input, bottomPosition, handleInput, color);
         return input;
     }
 }

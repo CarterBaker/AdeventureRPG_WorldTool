@@ -23,6 +23,8 @@ public class BlockEditor implements Editor {
     private int[][] sideTex;
     private int[][] bottomTex;
 
+    private int brushColor;
+
     public BlockEditor(DisplaySystem input) {
         this.displaySystem = input;
         this.cube = new SimpleCubeRenderer(cubePosition);
@@ -34,6 +36,7 @@ public class BlockEditor implements Editor {
     @Override
     public void render(SpriteBatch batch, float delta) {
         cube.render(delta);
+        imageTools.render(delta, cube.isDragging());
 
         UpdateCurrentTextures();
     }
@@ -41,6 +44,10 @@ public class BlockEditor implements Editor {
     @Override
     public void resize(int width, int height) {
         // Optional: handle resize
+    }
+
+    private void SetBrushColor(int input) {
+        brushColor = input;
     }
 
     private void SetTextureIds(int top, int side, int bottom) {
@@ -101,9 +108,9 @@ public class BlockEditor implements Editor {
     }
 
     public void UpdateCurrentTextures() {
-        topTex = imageTools.drawTopImage(topTex, true);
-        sideTex = imageTools.drawSideImage(sideTex, true);
-        bottomTex = imageTools.drawBottomImage(bottomTex, true);
+        topTex = imageTools.drawTopImage(topID, topTex, true, brushColor);
+        sideTex = imageTools.drawSideImage(sideID, sideTex, true, brushColor);
+        bottomTex = imageTools.drawBottomImage(bottomID, bottomTex, true, brushColor);
 
         updateCubeTexturesFromData();
     }
@@ -116,6 +123,6 @@ public class BlockEditor implements Editor {
         cube.setSideFace(3, displaySystem.convertToTextureRegion(sideTex));
         cube.setBottomFace(displaySystem.convertToTextureRegion(bottomTex));
 
-        cube.buildCube(); // Ensure it's built once
+        cube.buildCube();
     }
 }
