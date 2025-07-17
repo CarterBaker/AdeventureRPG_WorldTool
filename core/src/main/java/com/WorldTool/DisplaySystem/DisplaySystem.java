@@ -74,12 +74,20 @@ public class DisplaySystem {
         batch.dispose();
     }
 
-    // Save System \\
+    // ReferencesS \\
 
     // Blocks \\
 
+    public void SetBrushColor(int input) {
+        blockEditor.SetBrushColor(input);
+    }
+
     public void SetTextureIds(int top, int side, int bottom) {
         blockEditor.SetTextureIds(top, side, bottom);
+    }
+
+    public void convertAndSaveImages() {
+        blockEditor.convertAndSaveImages();
     }
 
     public void SaveBlocks(Block block) {

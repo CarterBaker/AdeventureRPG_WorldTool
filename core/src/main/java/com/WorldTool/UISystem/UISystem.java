@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class UISystem {
-    private final ToolManager tooleManager;
+    private final ToolManager toolManager;
     private final Stage stage;
     private final Skin skin;
     private final Table rootTable;
@@ -23,7 +23,7 @@ public class UISystem {
     private float ToolBarHeight = 20f;
 
     public UISystem(ToolManager base) {
-        tooleManager = base;
+        toolManager = base;
         stage = new Stage(new ScreenViewport());
         System.out.println(Gdx.files.internal("uiskin.json").file().getAbsolutePath());
 
@@ -69,7 +69,7 @@ public class UISystem {
     }
 
     public void ActivateEditor(ToolType type) {
-        tooleManager.ActivateEditor(type);
+        toolManager.ActivateEditor(type);
         toolPanel.SwitchTools(type);
     }
 
@@ -77,29 +77,37 @@ public class UISystem {
 
     // Blocks \\
 
+    public void SetBrushColor(int input) {
+        toolManager.SetBrushColor(input);
+    }
+
     public void SetTextureIds(int top, int side, int bottom) {
-        tooleManager.SetTextureIds(top, side, bottom);
+        toolManager.SetTextureIds(top, side, bottom);
+    }
+
+    public void convertAndSaveImages() {
+        toolManager.convertAndSaveImages();
     }
 
     public void SaveBlocks(Block block) {
-        tooleManager.SaveBlocks(block);
+        toolManager.SaveBlocks(block);
     }
 
     public Block LoadBlock(int ID) {
-        return tooleManager.LoadBlock(ID);
+        return toolManager.LoadBlock(ID);
     }
 
     public Map<Integer, Block> LoadAllBlocks() {
-        return tooleManager.LoadAllBlocks();
+        return toolManager.LoadAllBlocks();
     }
 
     // PNG \\
 
     public void SaveImage(int id, BufferedImage input) {
-        tooleManager.SaveImage(id, input);
+        toolManager.SaveImage(id, input);
     }
 
     public BufferedImage LoadImage(int id) {
-        return tooleManager.LoadImage(id);
+        return toolManager.LoadImage(id);
     }
 }

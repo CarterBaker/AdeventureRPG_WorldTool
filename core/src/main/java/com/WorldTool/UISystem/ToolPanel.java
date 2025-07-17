@@ -107,8 +107,16 @@ public class ToolPanel extends Table {
 
     // Blocks \\
 
+    public void SetBrushColor(int input) {
+        uiSystem.SetBrushColor(input);
+    }
+
     public void SetTextureIds(int top, int side, int bottom) {
         uiSystem.SetTextureIds(top, side, bottom);
+    }
+
+    public void convertAndSaveImages() {
+        uiSystem.convertAndSaveImages();
     }
 
     public void SaveBlocks(Block block) {

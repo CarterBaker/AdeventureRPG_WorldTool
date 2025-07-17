@@ -66,8 +66,16 @@ public class ToolManager implements Screen {
 
     // Blocks \\
 
+    public void SetBrushColor(int input) {
+        displaySystem.SetBrushColor(input);
+    }
+
     public void SetTextureIds(int top, int side, int bottom) {
         displaySystem.SetTextureIds(top, side, bottom);
+    }
+
+    public void convertAndSaveImages() {
+        displaySystem.convertAndSaveImages();
     }
 
     public void SaveBlocks(Block block) {

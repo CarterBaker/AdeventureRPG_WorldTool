@@ -25,7 +25,6 @@ public class ImageEditorTools {
 
     private int drawnCount = 0;
     private final float fixedScreenSpacing = 50f;
-    private final Map<Integer, Vector2> imageWorldPositions = new HashMap<>();
 
     private final OrthographicCamera camera;
 

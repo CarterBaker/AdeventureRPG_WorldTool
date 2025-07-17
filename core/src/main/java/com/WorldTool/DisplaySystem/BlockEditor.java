@@ -46,7 +46,7 @@ public final class BlockEditor implements Editor {
         // Optional: handle resize
     }
 
-    private void SetBrushColor(int input) {
+    public void SetBrushColor(int input) {
         brushColor = input;
     }
 
