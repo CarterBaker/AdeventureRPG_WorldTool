@@ -24,7 +24,7 @@ public class ImageEditorTools {
     private final Set<Integer> drawnIds = new HashSet<>();
 
     private int drawnCount = 0;
-    private final float fixedScreenSpacing = 10f;
+    private final float fixedScreenSpacing = 50f;
     private final Map<Integer, Vector2> imageWorldPositions = new HashMap<>();
 
     private final OrthographicCamera camera;
@@ -107,18 +107,11 @@ public class ImageEditorTools {
         int height = pixels.length;
         int width = pixels[0].length;
 
-        float spacingWorld = fixedScreenSpacing * pixelSize;
+        float imageWorldWidth = width * pixelSize;
+        float spacingWorld = fixedScreenSpacing * camera.zoom;
 
-        if (!imageWorldPositions.containsKey(id)) {
-            float imageWorldWidth = width * pixelSize;
-            float x = drawnCount * (imageWorldWidth + spacingWorld);
-            float y = 0;
-            imageWorldPositions.put(id, new Vector2(x, y));
-        }
-
-        Vector2 drawPos = imageWorldPositions.get(id);
-        float drawX = drawPos.x;
-        float drawY = drawPos.y;
+        float drawX = drawnCount * (imageWorldWidth + spacingWorld);
+        float drawY = 0;
 
         if (handleInput && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             Vector3 worldCoords = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
