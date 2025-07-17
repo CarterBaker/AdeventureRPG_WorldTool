@@ -90,26 +90,17 @@ public class ToolPanel extends Table {
     }
 
     private ToolProvider getToolProvider(ToolType type) {
-        switch (type) {
-            case BLOCK:
-                return new BlockTools(this);
-            case PROP:
-                return new PropTools();
-            case ITEM:
-                return new ItemTools();
-            case ENTITY:
-                return new EntityTools();
-            case ANIMATION:
-                return new AnimationTools();
-            case STRUCTURE:
-                return new StructureTools();
-            case REGION:
-                return new RegionTools();
-            case WORLD:
-                return new WorldTools();
-            default:
-                return null;
-        }
+        return switch (type) {
+            case BLOCK -> new BlockTools(this);
+            case PROP -> new PropTools();
+            case ITEM -> new ItemTools();
+            case ENTITY -> new EntityTools();
+            case ANIMATION -> new AnimationTools();
+            case STRUCTURE -> new StructureTools();
+            case REGION -> new RegionTools();
+            case WORLD -> new WorldTools();
+            default -> null;
+        };
     }
 
     // References \\

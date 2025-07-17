@@ -1,17 +1,19 @@
 package com.WorldTool.UISystem.ToolPanelTools;
 
+import com.WorldTool.Block;
 import com.WorldTool.UISystem.ToolPanel;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class BlockTools implements ToolProvider {
 
     private TextField blockField, topField, sideField, bottomField;
-
-    private final ToolPanel toolPanel; // Needs to be passed in externally somehow
+    private final ToolPanel toolPanel;
 
     public BlockTools(ToolPanel input) {
         this.toolPanel = input;
@@ -26,6 +28,9 @@ public class BlockTools implements ToolProvider {
         blockField.setMessageText("Block ID");
         panel.add(blockField).pad(2).row();
 
+        TextButton loadButton = new TextButton("Load Block", skin);
+        panel.add(loadButton).pad(2).row();
+
         topField = new TextField("", skin);
         topField.setMessageText("Top ID");
         panel.add(topField).pad(2).row();
@@ -38,26 +43,50 @@ public class BlockTools implements ToolProvider {
         bottomField.setMessageText("Bottom ID");
         panel.add(bottomField).pad(2).row();
 
-        TextButton applyButton = new TextButton("Apply", skin);
-        applyButton.addListener(event -> {
-            if (!applyButton.isPressed())
-                return false;
-
-            try {
-                int block = Integer.parseInt(blockField.getText());
-                int top = Integer.parseInt(topField.getText());
-                int side = Integer.parseInt(sideField.getText());
-                int bottom = Integer.parseInt(bottomField.getText());
-
-                toolPanel.SetTextureIds(top, side, bottom);
-                // Optional: set brush color too
-                // editor.SetBrushColor(brush);
-
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input in one of the fields.");
+        // Load Block Button Logic
+        loadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    int id = Integer.parseInt(blockField.getText());
+                    Block block = toolPanel.LoadBlock(id);
+                    if (block != null) {
+                        topField.setText(String.valueOf(block.top));
+                        sideField.setText(String.valueOf(block.sides));
+                        bottomField.setText(String.valueOf(block.bottom));
+                        toolPanel.SetTextureIds(block.top, block.sides, block.bottom);
+                    } else {
+                        topField.setText("?");
+                        sideField.setText("?");
+                        bottomField.setText("?");
+                    }
+                } catch (NumberFormatException e) {
+                    topField.setText("!");
+                    sideField.setText("!");
+                    bottomField.setText("!");
+                }
             }
-            return true;
         });
-        panel.add(applyButton).padTop(5).row();
+
+        // --- Save Button ---
+        TextButton saveButton = new TextButton("Save Block", skin);
+        panel.add(saveButton).pad(4).row();
+
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    Block block = new Block();
+                    block.ID = Integer.parseInt(blockField.getText());
+                    block.top = Integer.parseInt(topField.getText());
+                    block.sides = Integer.parseInt(sideField.getText());
+                    block.bottom = Integer.parseInt(bottomField.getText());
+                    toolPanel.SaveBlocks(block);
+                } catch (NumberFormatException e) {
+                    // Optionally provide visual feedback or logging
+                    System.out.println("Invalid input. Block not saved.");
+                }
+            }
+        });
     }
 }

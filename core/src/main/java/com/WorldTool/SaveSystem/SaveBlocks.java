@@ -1,24 +1,38 @@
 package com.WorldTool.SaveSystem;
 
-import com.WorldTool.Block;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.WorldTool.Block;
+
 public class SaveBlocks {
 
-    private String path;
+    private static final String BlockFile = "blocks.dat";
+    private final File saveFile;
 
     public SaveBlocks(String path) {
-        this.path = path;
+        // Create the directory if it doesn't exist
+        File folder = new File(path);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        // Define the full path to the blocks.dat file
+        saveFile = new File(folder, BlockFile);
     }
 
     public void Save(Block block) {
         Map<Integer, Block> blocks = LoadAll();
         blocks.put(block.ID, block);
 
-        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(path)))) {
+        try (DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(saveFile)))) {
             for (Block b : blocks.values()) {
                 dos.writeInt(b.ID);
                 dos.writeInt(b.top);
@@ -31,8 +45,12 @@ public class SaveBlocks {
     }
 
     public Block Load(int ID) {
-        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(path)))) {
-            while (dis.available() >= 16) { // 4 ints = 16 bytes
+        if (!saveFile.exists()) {
+            return null;
+        }
+
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(saveFile)))) {
+            while (dis.available() >= 16) {
                 int id = dis.readInt();
                 int top = dis.readInt();
                 int bottom = dis.readInt();
@@ -55,10 +73,10 @@ public class SaveBlocks {
 
     public Map<Integer, Block> LoadAll() {
         Map<Integer, Block> blocks = new HashMap<>();
-        File file = new File(path);
-        if (!file.exists()) return blocks;
+        if (!saveFile.exists())
+            return blocks;
 
-        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(saveFile)))) {
             while (dis.available() >= 16) {
                 Block block = new Block();
                 block.ID = dis.readInt();

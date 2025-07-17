@@ -17,7 +17,7 @@ public class ImageSystem {
         if (!path.endsWith("/") && !path.endsWith("\\")) {
             path += System.getProperty("file.separator");
         }
-        this.path = path + "textures";
+        this.path = path + "textures/";
 
         this.save = new SavePNG();
         this.load = new LoadPNG();
