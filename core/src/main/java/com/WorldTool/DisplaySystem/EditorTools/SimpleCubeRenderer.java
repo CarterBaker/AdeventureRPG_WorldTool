@@ -164,10 +164,11 @@ public class SimpleCubeRenderer {
                 ModelBuilder builder = new ModelBuilder();
                 builder.begin();
 
-                // Initialize materials
-                faceMaterials[0] = topFace != null ? new Material(TextureAttribute.createDiffuse(topFace.getTexture()))
+                // Correct top and bottom materials
+                faceMaterials[1] = topFace != null
+                                ? new Material(TextureAttribute.createDiffuse(topFace.getTexture()))
                                 : new Material();
-                faceMaterials[1] = bottomFace != null
+                faceMaterials[0] = bottomFace != null
                                 ? new Material(TextureAttribute.createDiffuse(bottomFace.getTexture()))
                                 : new Material();
                 for (int i = 0; i < 4; i++) {
@@ -176,7 +177,7 @@ public class SimpleCubeRenderer {
                                         : new Material();
                 }
 
-                // Build geometry
+                // Top face (+Y)
                 MeshPartBuilder top = builder.part("top", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[0]);
                 top.rect(
@@ -186,6 +187,7 @@ public class SimpleCubeRenderer {
                                 new Vector3(+0.5f, +0.5f, -0.5f),
                                 new Vector3(0, 1, 0));
 
+                // Bottom face (-Y)
                 MeshPartBuilder bottom = builder.part("bottom", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[1]);
                 bottom.rect(
@@ -195,44 +197,49 @@ public class SimpleCubeRenderer {
                                 new Vector3(+0.5f, -0.5f, +0.5f),
                                 new Vector3(0, -1, 0));
 
+                // Side 1 (-X) — rotated +90°
                 MeshPartBuilder side1 = builder.part("side1", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[2]);
                 side1.rect(
-                                new Vector3(-0.5f, -0.5f, -0.5f),
                                 new Vector3(-0.5f, +0.5f, -0.5f),
                                 new Vector3(-0.5f, +0.5f, +0.5f),
                                 new Vector3(-0.5f, -0.5f, +0.5f),
+                                new Vector3(-0.5f, -0.5f, -0.5f),
                                 new Vector3(-1, 0, 0));
 
+                // Side 2 (+X) — rotated +90°
                 MeshPartBuilder side2 = builder.part("side2", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[3]);
                 side2.rect(
-                                new Vector3(+0.5f, -0.5f, +0.5f),
                                 new Vector3(+0.5f, +0.5f, +0.5f),
                                 new Vector3(+0.5f, +0.5f, -0.5f),
                                 new Vector3(+0.5f, -0.5f, -0.5f),
+                                new Vector3(+0.5f, -0.5f, +0.5f),
                                 new Vector3(1, 0, 0));
 
+                // Side 3 (+Z) — rotated +90°
                 MeshPartBuilder side3 = builder.part("side3", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[4]);
                 side3.rect(
-                                new Vector3(-0.5f, -0.5f, +0.5f),
                                 new Vector3(-0.5f, +0.5f, +0.5f),
                                 new Vector3(+0.5f, +0.5f, +0.5f),
                                 new Vector3(+0.5f, -0.5f, +0.5f),
+                                new Vector3(-0.5f, -0.5f, +0.5f),
                                 new Vector3(0, 0, 1));
 
+                // Side 4 (-Z) — rotated +90°
                 MeshPartBuilder side4 = builder.part("side4", GL20.GL_TRIANGLES,
                                 Usage.Position | Usage.Normal | Usage.TextureCoordinates, faceMaterials[5]);
                 side4.rect(
-                                new Vector3(+0.5f, -0.5f, -0.5f),
                                 new Vector3(+0.5f, +0.5f, -0.5f),
                                 new Vector3(-0.5f, +0.5f, -0.5f),
                                 new Vector3(-0.5f, -0.5f, -0.5f),
+                                new Vector3(+0.5f, -0.5f, -0.5f),
                                 new Vector3(0, 0, -1));
 
                 cubeModel = builder.end();
                 cubeInstance = new ModelInstance(cubeModel);
                 built = true;
         }
+
 }
