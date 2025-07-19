@@ -91,39 +91,110 @@ public class WorldEditor implements Editor {
         shapeRenderer.setProjectionMatrix(camera.combined);
 
         // --- Draw Tiles ---
+        int startX = Math.max(0, (int) (camera.position.x / tileSize - viewport.getWorldWidth() / (2 * tileSize)) - 1);
+        int endX = Math.min(tiles[0].length - 1,
+                (int) (camera.position.x / tileSize + viewport.getWorldWidth() / (2 * tileSize)) + 1);
+
+        int startY = Math.max(0, (int) (camera.position.y / tileSize - viewport.getWorldHeight() / (2 * tileSize)) - 1);
+        int endY = Math.min(tiles.length - 1,
+                (int) (camera.position.y / tileSize + viewport.getWorldHeight() / (2 * tileSize)) + 1);
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (int y = 0; y < tiles.length; y++) {
-            for (int x = 0; x < tiles[0].length; x++) {
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
                 WorldTile tile = tiles[y][x];
                 Region region = regionMap.get(tile.regionID);
                 if (region == null)
                     continue;
 
-                Color color = intToColor(region.color);
+                Color color = getTileColor(tile);
                 shapeRenderer.setColor(color);
                 shapeRenderer.rect(x * tileSize, y * tileSize, tileSize, tileSize);
             }
         }
         shapeRenderer.end();
 
-        // --- Draw Gridlines ---
+        // --- Draw Roads and Rivers Connections ---
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.BLACK); // Gridline color
 
-        int gridHeight = tiles.length;
-        int gridWidth = tiles[0].length;
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                WorldTile tile = tiles[y][x];
+                float centerX = x * tileSize + tileSize / 2f;
+                float centerY = y * tileSize + tileSize / 2f;
 
-        for (int y = 0; y <= gridHeight; y++) {
-            float yPos = y * tileSize;
-            shapeRenderer.line(0, yPos, gridWidth * tileSize, yPos); // Horizontal lines
-        }
+                // → Right
+                if (x + 1 < tiles[0].length) {
+                    WorldTile right = tiles[y][x + 1];
+                    if (tile.road && right.road) {
+                        shapeRenderer.setColor(Color.BLACK);
+                        shapeRenderer.line(centerX, centerY, centerX + tileSize, centerY);
+                    }
+                    if (tile.river && right.river) {
+                        shapeRenderer.setColor(Color.BLUE);
+                        shapeRenderer.line(centerX, centerY, centerX + tileSize, centerY);
+                    }
+                }
 
-        for (int x = 0; x <= gridWidth; x++) {
-            float xPos = x * tileSize;
-            shapeRenderer.line(xPos, 0, xPos, gridHeight * tileSize); // Vertical lines
+                // ↑ Up
+                if (y + 1 < tiles.length) {
+                    WorldTile up = tiles[y + 1][x];
+                    if (tile.road && up.road) {
+                        shapeRenderer.setColor(Color.BLACK);
+                        shapeRenderer.line(centerX, centerY, centerX, centerY + tileSize);
+                    }
+                    if (tile.river && up.river) {
+                        shapeRenderer.setColor(Color.BLUE);
+                        shapeRenderer.line(centerX, centerY, centerX, centerY + tileSize);
+                    }
+                }
+
+                // ↗ Up-Right
+                if (x + 1 < tiles[0].length && y + 1 < tiles.length) {
+                    WorldTile upRight = tiles[y + 1][x + 1];
+                    if (tile.road && upRight.road) {
+                        shapeRenderer.setColor(Color.BLACK);
+                        shapeRenderer.line(centerX, centerY, centerX + tileSize, centerY + tileSize);
+                    }
+                    if (tile.river && upRight.river) {
+                        shapeRenderer.setColor(Color.BLUE);
+                        shapeRenderer.line(centerX, centerY, centerX + tileSize, centerY + tileSize);
+                    }
+                }
+
+                // ↖ Up-Left
+                if (x - 1 >= 0 && y + 1 < tiles.length) {
+                    WorldTile upLeft = tiles[y + 1][x - 1];
+                    if (tile.road && upLeft.road) {
+                        shapeRenderer.setColor(Color.BLACK);
+                        shapeRenderer.line(centerX, centerY, centerX - tileSize, centerY + tileSize);
+                    }
+                    if (tile.river && upLeft.river) {
+                        shapeRenderer.setColor(Color.BLUE);
+                        shapeRenderer.line(centerX, centerY, centerX - tileSize, centerY + tileSize);
+                    }
+                }
+            }
         }
 
         shapeRenderer.end();
+
+        // Draw grid lines only for visible tiles
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.BLACK);
+
+        for (int y = startY; y <= endY + 1; y++) {
+            float yPos = y * tileSize;
+            shapeRenderer.line(startX * tileSize, yPos, (endX + 1) * tileSize, yPos);
+        }
+
+        for (int x = startX; x <= endX + 1; x++) {
+            float xPos = x * tileSize;
+            shapeRenderer.line(xPos, startY * tileSize, xPos, (endY + 1) * tileSize);
+        }
+
+        shapeRenderer.end();
+
     }
 
     @Override
@@ -190,28 +261,31 @@ public class WorldEditor implements Editor {
             float screenX = Gdx.input.getX();
             float screenY = Gdx.input.getY();
 
-            // Convert screen to world coordinates
             Vector3 worldCoords = camera.unproject(new Vector3(screenX, screenY, 0));
 
             int tileX = (int) (worldCoords.x / tileSize);
             int tileY = (int) (worldCoords.y / tileSize);
 
             if (tileY >= 0 && tileY < tiles.length && tileX >= 0 && tileX < tiles[0].length) {
+                int button = Gdx.input.isButtonPressed(com.badlogic.gdx.Input.Buttons.RIGHT)
+                        ? com.badlogic.gdx.Input.Buttons.RIGHT
+                        : com.badlogic.gdx.Input.Buttons.LEFT;
+
                 WorldTile oldTile = tiles[tileY][tileX];
-                WorldTile newTile = applyToolToTile(oldTile);
+                WorldTile newTile = applyToolToTile(oldTile, button);
                 tiles[tileY][tileX] = newTile;
             }
         }
     }
 
-    private WorldTile applyToolToTile(WorldTile tile) {
+    private WorldTile applyToolToTile(WorldTile tile, int button) {
         switch (currentTool) {
             case regionBrush:
                 return applyRegionBrush(tile);
             case HeightBrush:
-                return applyHeightBrush(tile);
+                return applyHeightBrush(tile, button);
             case TempermentBrush:
-                return applyTemperatureBrush(tile);
+                return applyTemperatureBrush(tile, button);
             case RiverBrush:
                 return applyRiverBrush(tile);
             case Roadbrush:
@@ -226,13 +300,23 @@ public class WorldEditor implements Editor {
         return tile;
     }
 
-    private WorldTile applyHeightBrush(WorldTile tile) {
-        tile.elevation += 0.1f;
+    private WorldTile applyHeightBrush(WorldTile tile, int button) {
+        float delta = 0.1f;
+        if (button == com.badlogic.gdx.Input.Buttons.LEFT) {
+            tile.elevation -= delta;
+        } else {
+            tile.elevation += delta;
+        }
         return tile;
     }
 
-    private WorldTile applyTemperatureBrush(WorldTile tile) {
-        tile.temperature += 1.0f;
+    private WorldTile applyTemperatureBrush(WorldTile tile, int button) {
+        float delta = 1.0f;
+        if (button == com.badlogic.gdx.Input.Buttons.LEFT) {
+            tile.temperature -= delta;
+        } else {
+            tile.temperature += delta;
+        }
         return tile;
     }
 
@@ -254,6 +338,63 @@ public class WorldEditor implements Editor {
     // Set world tiles after loading
     public void SetWorldTiles(WorldTile[][] input) {
         tiles = input;
+    }
+
+    private Color getTileColor(WorldTile tile) {
+        switch (currentTool) {
+            case regionBrush:
+            case RiverBrush:
+            case Roadbrush:
+                Region region = regionMap.get(tile.regionID);
+                return (region != null) ? intToColor(region.color) : Color.GRAY;
+
+            case TempermentBrush:
+                // Temperature gradient: Blue (cold) → Green → Yellow → Orange → Red (hot)
+                return temperatureToColor(tile.temperature);
+
+            case HeightBrush:
+                // Height gradient: Black (low) → White (high)
+                return heightToColor(tile.elevation);
+
+            default:
+                return Color.GRAY;
+        }
+    }
+
+    private Color temperatureToColor(float temperature) {
+        float minTemp = -30f;
+        float maxTemp = 50f;
+
+        float t = Math.max(0, Math.min(1, (temperature - minTemp) / (maxTemp - minTemp)));
+
+        if (t < 0.25f) {
+            // Blue to Green
+            return interpolateColor(Color.BLUE, Color.GREEN, t / 0.25f);
+        } else if (t < 0.5f) {
+            // Green to Yellow
+            return interpolateColor(Color.GREEN, Color.YELLOW, (t - 0.25f) / 0.25f);
+        } else if (t < 0.75f) {
+            // Yellow to Orange
+            return interpolateColor(Color.YELLOW, Color.ORANGE, (t - 0.5f) / 0.25f);
+        } else {
+            // Orange to Red
+            return interpolateColor(Color.ORANGE, Color.RED, (t - 0.75f) / 0.25f);
+        }
+    }
+
+    private Color heightToColor(float elevation) {
+        float minElev = 0f;
+        float maxElev = 10f; // Adjust if necessary
+        float t = Math.max(0, Math.min(1, (elevation - minElev) / (maxElev - minElev)));
+        return interpolateColor(Color.BLACK, Color.WHITE, t);
+    }
+
+    private Color interpolateColor(Color start, Color end, float t) {
+        float r = start.r + t * (end.r - start.r);
+        float g = start.g + t * (end.g - start.g);
+        float b = start.b + t * (end.b - start.b);
+        float a = start.a + t * (end.a - start.a);
+        return new Color(r, g, b, a);
     }
 
 }
