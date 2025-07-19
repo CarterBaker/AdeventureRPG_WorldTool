@@ -5,6 +5,8 @@ import java.util.Map;
 import com.WorldTool.Block;
 import com.WorldTool.Region;
 import com.WorldTool.ToolType;
+import com.WorldTool.WorldTile;
+import com.WorldTool.DisplaySystem.EditorTools.WorldToolType;
 import com.WorldTool.UISystem.ToolPanelTools.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -134,14 +136,6 @@ public class ToolPanel extends Table {
 
     // Regions \\
 
-    public void SetWorldScale(int x, int y) {
-        uiSystem.SetWorldScale(x, y);
-    }
-
-    public void SetCurrentRegion(Region region) {
-        uiSystem.SetCurrentRegion(region);
-    }
-
     public void SaveRegion(Region region) {
         uiSystem.SaveRegion(region);
     }
@@ -152,6 +146,36 @@ public class ToolPanel extends Table {
 
     public Map<Integer, Region> LoadAllRegions() {
         return uiSystem.LoadAllRegions();
+    }
+
+    // World \\
+
+    public void SetWorldToolType(WorldToolType input) {
+        uiSystem.SetWorldToolType(input);
+    }
+
+    public void SetWorldScale(int x, int y) {
+        uiSystem.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        uiSystem.SetCurrentRegion(region);
+    }
+
+    public WorldTile[][] GetCurrentWorldTiles() {
+        return uiSystem.GetCurrentWorldTiles();
+    }
+
+    public void SetWorldTiles(WorldTile[][] input) {
+        uiSystem.SetWorldTiles(input);
+    }
+
+    public void SaveWorld(WorldTile[][] worldTile) {
+        uiSystem.SaveWorld(worldTile);
+    }
+
+    public WorldTile[][] LoadWorld() {
+        return uiSystem.LoadWorld();
     }
 
     // PNG \\

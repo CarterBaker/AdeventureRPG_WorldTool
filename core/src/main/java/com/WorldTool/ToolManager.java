@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import com.WorldTool.DisplaySystem.DisplaySystem;
+import com.WorldTool.DisplaySystem.EditorTools.WorldToolType;
 import com.WorldTool.SaveSystem.SaveSystem;
 import com.WorldTool.UISystem.UISystem;
 import com.badlogic.gdx.Gdx;
@@ -106,12 +107,24 @@ public class ToolManager implements Screen {
 
     // World \\
 
+    public void SetWorldToolType (WorldToolType input) {
+        displaySystem.SetWorldToolType(input);
+    }
+
     public void SetWorldScale(int x, int y) {
         displaySystem.SetWorldScale(x, y);
     }
 
     public void SetCurrentRegion(Region region) {
         displaySystem.SetCurrentRegion(region);
+    }
+
+    public WorldTile[][] GetCurrentWorldTiles() {
+        return displaySystem.GetCurrentWorldTiles();
+    }
+
+    public void SetWorldTiles(WorldTile[][] input) {
+        displaySystem.SetWorldTiles(input);
     }
 
     public void SaveWorld(WorldTile[][] worldTile) {

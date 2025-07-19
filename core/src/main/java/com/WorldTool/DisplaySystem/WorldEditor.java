@@ -2,7 +2,9 @@ package com.WorldTool.DisplaySystem;
 
 import com.WorldTool.Region;
 import com.WorldTool.WorldTile;
+import com.WorldTool.DisplaySystem.EditorTools.WorldToolType;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -12,6 +14,8 @@ import com.badlogic.gdx.Gdx;
 import java.util.Map;
 
 public class WorldEditor implements Editor {
+
+    private WorldToolType currentTool = WorldToolType.regionBrush;
 
     private WorldTile[][] tiles;
     Map<Integer, Region> regionMap;
@@ -50,6 +54,8 @@ public class WorldEditor implements Editor {
     public void render(SpriteBatch batch, float delta) {
         if (tiles == null)
             return;
+
+        handleClick();
 
         // --- Handle Zoom ---
         if (Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.PLUS)
@@ -99,11 +105,35 @@ public class WorldEditor implements Editor {
             }
         }
         shapeRenderer.end();
+
+        // --- Draw Gridlines ---
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.BLACK); // Gridline color
+
+        int gridHeight = tiles.length;
+        int gridWidth = tiles[0].length;
+
+        for (int y = 0; y <= gridHeight; y++) {
+            float yPos = y * tileSize;
+            shapeRenderer.line(0, yPos, gridWidth * tileSize, yPos); // Horizontal lines
+        }
+
+        for (int x = 0; x <= gridWidth; x++) {
+            float xPos = x * tileSize;
+            shapeRenderer.line(xPos, 0, xPos, gridHeight * tileSize); // Vertical lines
+        }
+
+        shapeRenderer.end();
     }
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
+        float aspect = (float) width / height;
+        float worldHeight = 100; // or any constant
+        float worldWidth = worldHeight * aspect;
+
+        viewport.setWorldSize(worldWidth, worldHeight);
+        viewport.update(width, height, true);
     }
 
     private Color intToColor(int rgba) {
@@ -112,6 +142,10 @@ public class WorldEditor implements Editor {
         float g = ((rgba >> 8) & 0xff) / 255f;
         float b = (rgba & 0xff) / 255f;
         return new Color(r, g, b, a);
+    }
+
+    public void SetToolType(WorldToolType input) {
+        currentTool = input;
     }
 
     public void SetWorldScale(int newWidth, int newHeight) {
@@ -150,4 +184,76 @@ public class WorldEditor implements Editor {
     public void SetCurrentRegion(Region region) {
         currentRegion = region;
     }
+
+    private void handleClick() {
+        if (Gdx.input.justTouched()) {
+            float screenX = Gdx.input.getX();
+            float screenY = Gdx.input.getY();
+
+            // Convert screen to world coordinates
+            Vector3 worldCoords = camera.unproject(new Vector3(screenX, screenY, 0));
+
+            int tileX = (int) (worldCoords.x / tileSize);
+            int tileY = (int) (worldCoords.y / tileSize);
+
+            if (tileY >= 0 && tileY < tiles.length && tileX >= 0 && tileX < tiles[0].length) {
+                WorldTile oldTile = tiles[tileY][tileX];
+                WorldTile newTile = applyToolToTile(oldTile);
+                tiles[tileY][tileX] = newTile;
+            }
+        }
+    }
+
+    private WorldTile applyToolToTile(WorldTile tile) {
+        switch (currentTool) {
+            case regionBrush:
+                return applyRegionBrush(tile);
+            case HeightBrush:
+                return applyHeightBrush(tile);
+            case TempermentBrush:
+                return applyTemperatureBrush(tile);
+            case RiverBrush:
+                return applyRiverBrush(tile);
+            case Roadbrush:
+                return applyRoadBrush(tile);
+            default:
+                return tile;
+        }
+    }
+
+    private WorldTile applyRegionBrush(WorldTile tile) {
+        tile.regionID = currentRegion != null ? currentRegion.ID : tile.regionID;
+        return tile;
+    }
+
+    private WorldTile applyHeightBrush(WorldTile tile) {
+        tile.elevation += 0.1f;
+        return tile;
+    }
+
+    private WorldTile applyTemperatureBrush(WorldTile tile) {
+        tile.temperature += 1.0f;
+        return tile;
+    }
+
+    private WorldTile applyRiverBrush(WorldTile tile) {
+        tile.river = !tile.river;
+        return tile;
+    }
+
+    private WorldTile applyRoadBrush(WorldTile tile) {
+        tile.road = !tile.road;
+        return tile;
+    }
+
+    // Get current world tiles
+    public WorldTile[][] GetCurrentWorldTiles() {
+        return tiles;
+    }
+
+    // Set world tiles after loading
+    public void SetWorldTiles(WorldTile[][] input) {
+        tiles = input;
+    }
+
 }

@@ -8,6 +8,7 @@ import com.WorldTool.Region;
 import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
 import com.WorldTool.WorldTile;
+import com.WorldTool.DisplaySystem.EditorTools.WorldToolType;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -117,12 +118,24 @@ public class DisplaySystem {
 
     // World \\
 
+    public void SetWorldToolType (WorldToolType input) {
+        worldEditor.SetToolType(input);
+    }
+
     public void SetWorldScale(int x, int y) {
         worldEditor.SetWorldScale(x, y);
     }
 
     public void SetCurrentRegion(Region region) {
         worldEditor.SetCurrentRegion(region);
+    }
+
+    public WorldTile[][] GetCurrentWorldTiles() {
+        return worldEditor.GetCurrentWorldTiles();
+    }
+
+    public void SetWorldTiles(WorldTile[][] input) {
+        worldEditor.SetWorldTiles(input);
     }
 
     public void SaveWorld(WorldTile[][] worldTile) {

@@ -7,6 +7,8 @@ import com.WorldTool.Block;
 import com.WorldTool.Region;
 import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
+import com.WorldTool.WorldTile;
+import com.WorldTool.DisplaySystem.EditorTools.WorldToolType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -104,14 +106,6 @@ public class UISystem {
 
     // Regions \\
 
-    public void SetWorldScale(int x, int y) {
-        toolManager.SetWorldScale(x, y);
-    }
-
-    public void SetCurrentRegion(Region region) {
-        toolManager.SetCurrentRegion(region);
-    }
-
     public void SaveRegion(Region region) {
         toolManager.SaveRegion(region);
     }
@@ -122,6 +116,36 @@ public class UISystem {
 
     public Map<Integer, Region> LoadAllRegions() {
         return toolManager.LoadAllRegions();
+    }
+
+    // World \\
+
+    public void SetWorldToolType(WorldToolType input) {
+        toolManager.SetWorldToolType(input);
+    }
+
+    public void SetWorldScale(int x, int y) {
+        toolManager.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        toolManager.SetCurrentRegion(region);
+    }
+
+    public WorldTile[][] GetCurrentWorldTiles() {
+        return toolManager.GetCurrentWorldTiles();
+    }
+
+    public void SetWorldTiles(WorldTile[][] input) {
+        toolManager.SetWorldTiles(input);
+    }
+
+    public void SaveWorld(WorldTile[][] worldTile) {
+        toolManager.SaveWorld(worldTile);
+    }
+
+    public WorldTile[][] LoadWorld() {
+        return toolManager.LoadWorld();
     }
 
     // PNG \\
