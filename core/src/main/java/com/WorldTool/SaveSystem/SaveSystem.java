@@ -5,6 +5,8 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import com.WorldTool.Block;
+import com.WorldTool.Region;
+import com.WorldTool.WorldTile;
 import com.WorldTool.ImageSystem.ImageSystem;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -34,8 +36,8 @@ public class SaveSystem {
         this.entities = new SaveEntities();
         this.animations = new SaveAnimations();
         this.structures = new SaveStructures();
-        this.regions = new SaveRegions();
-        this.world = new SaveWorld();
+        this.regions = new SaveRegions(path);
+        this.world = new SaveWorld(path);
 
         this.image = new ImageSystem(path);
     }
@@ -60,28 +62,52 @@ public class SaveSystem {
         props.Save();
     }
 
+    // Items \\
+
     public void SaveItems() {
         items.Save();
     }
+
+    // Entities \\
 
     public void SaveEntities() {
         entities.Save();
     }
 
+    // Animations \\
+
     public void SaveAnimations() {
         animations.Save();
     }
+
+    // Structures \\
 
     public void SaveStructures() {
         structures.Save();
     }
 
-    public void SaveRegions() {
-        regions.Save();
+    // Regions \\
+
+    public void SaveRegion(Region region) {
+        regions.Save(region);
     }
 
-    public void SaveWorld() {
-        world.Save();
+    public Region LoadRegion(int ID) {
+        return regions.Load(ID);
+    }
+
+    public Map<Integer, Region> LoadAllRegions() {
+        return regions.LoadAll();
+    }
+
+    // World \\
+
+    public void SaveWorld(WorldTile[][] worldTile) {
+        world.Save(worldTile);
+    }
+
+    public WorldTile[][] LoadWorld() {
+        return world.Load();
     }
 
     // PNG \\

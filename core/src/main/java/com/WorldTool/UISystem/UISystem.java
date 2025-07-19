@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import com.WorldTool.Block;
+import com.WorldTool.Region;
 import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
 import com.badlogic.gdx.Gdx;
@@ -99,6 +100,28 @@ public class UISystem {
 
     public Map<Integer, Block> LoadAllBlocks() {
         return toolManager.LoadAllBlocks();
+    }
+
+    // Regions \\
+
+    public void SetWorldScale(int x, int y) {
+        toolManager.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        toolManager.SetCurrentRegion(region);
+    }
+
+    public void SaveRegion(Region region) {
+        toolManager.SaveRegion(region);
+    }
+
+    public Region LoadRegion(int ID) {
+        return toolManager.LoadRegion(ID);
+    }
+
+    public Map<Integer, Region> LoadAllRegions() {
+        return toolManager.LoadAllRegions();
     }
 
     // PNG \\

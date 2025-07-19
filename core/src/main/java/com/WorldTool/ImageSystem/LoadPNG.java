@@ -31,7 +31,7 @@ public class LoadPNG {
             return ImageIO.read(inputFile);
         } catch (Exception e) {
             e.printStackTrace();
-            return createBlankWhiteImage(16, 16); // Fallback white image
+            return createBlankWhiteImage(32, 32); // Fallback white image
         }
     }
 

@@ -3,6 +3,7 @@ package com.WorldTool.UISystem;
 import java.util.Map;
 
 import com.WorldTool.Block;
+import com.WorldTool.Region;
 import com.WorldTool.ToolType;
 import com.WorldTool.UISystem.ToolPanelTools.*;
 import com.badlogic.gdx.Gdx;
@@ -97,8 +98,8 @@ public class ToolPanel extends Table {
             case ENTITY -> new EntityTools();
             case ANIMATION -> new AnimationTools();
             case STRUCTURE -> new StructureTools();
-            case REGION -> new RegionTools();
-            case WORLD -> new WorldTools();
+            case REGION -> new RegionTools(this);
+            case WORLD -> new WorldTools(this);
             default -> null;
         };
     }
@@ -129,6 +130,28 @@ public class ToolPanel extends Table {
 
     public Map<Integer, Block> LoadAllBlocks() {
         return uiSystem.LoadAllBlocks();
+    }
+
+    // Regions \\
+
+    public void SetWorldScale(int x, int y) {
+        uiSystem.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        uiSystem.SetCurrentRegion(region);
+    }
+
+    public void SaveRegion(Region region) {
+        uiSystem.SaveRegion(region);
+    }
+
+    public Region LoadRegion(int ID) {
+        return uiSystem.LoadRegion(ID);
+    }
+
+    public Map<Integer, Region> LoadAllRegions() {
+        return uiSystem.LoadAllRegions();
     }
 
     // PNG \\

@@ -90,6 +90,38 @@ public class ToolManager implements Screen {
         return saveSystem.LoadAllBlocks();
     }
 
+    // Regions \\
+
+    public void SaveRegion(Region region) {
+        saveSystem.SaveRegion(region);
+    }
+
+    public Region LoadRegion(int ID) {
+        return saveSystem.LoadRegion(ID);
+    }
+
+    public Map<Integer, Region> LoadAllRegions() {
+        return saveSystem.LoadAllRegions();
+    }
+
+    // World \\
+
+    public void SetWorldScale(int x, int y) {
+        displaySystem.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        displaySystem.SetCurrentRegion(region);
+    }
+
+    public void SaveWorld(WorldTile[][] worldTile) {
+        saveSystem.SaveWorld(worldTile);
+    }
+
+    public WorldTile[][] LoadWorld() {
+        return saveSystem.LoadWorld();
+    }
+
     // PNG \\
 
     public void SaveImage(int id, BufferedImage input) {

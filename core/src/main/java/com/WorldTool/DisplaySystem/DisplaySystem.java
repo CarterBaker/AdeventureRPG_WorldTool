@@ -1,10 +1,13 @@
 package com.WorldTool.DisplaySystem;
 
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import com.WorldTool.Block;
+import com.WorldTool.Region;
 import com.WorldTool.ToolManager;
 import com.WorldTool.ToolType;
+import com.WorldTool.WorldTile;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -37,7 +40,7 @@ public class DisplaySystem {
         animationEditor = new AnimationEditor();
         structureEditor = new StructureEditor();
         regionEditor = new RegionEditor();
-        worldEditor = new WorldEditor();
+        worldEditor = new WorldEditor(input.LoadAllRegions());
 
         currentEditor = null;
     }
@@ -96,6 +99,38 @@ public class DisplaySystem {
 
     public Block LoadBlock(int id) {
         return toolManager.LoadBlock(id);
+    }
+
+    // Regions \\
+
+    public void SaveRegion(Region region) {
+        toolManager.SaveRegion(region);
+    }
+
+    public Region LoadRegion(int ID) {
+        return toolManager.LoadRegion(ID);
+    }
+
+    public Map<Integer, Region> LoadAllRegions() {
+        return toolManager.LoadAllRegions();
+    }
+
+    // World \\
+
+    public void SetWorldScale(int x, int y) {
+        worldEditor.SetWorldScale(x, y);
+    }
+
+    public void SetCurrentRegion(Region region) {
+        worldEditor.SetCurrentRegion(region);
+    }
+
+    public void SaveWorld(WorldTile[][] worldTile) {
+        toolManager.SaveWorld(worldTile);
+    }
+
+    public WorldTile[][] LoadWorld() {
+        return toolManager.LoadWorld();
     }
 
     // PNG \\
