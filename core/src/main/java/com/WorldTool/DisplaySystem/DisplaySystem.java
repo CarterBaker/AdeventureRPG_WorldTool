@@ -118,7 +118,7 @@ public class DisplaySystem {
 
     // World \\
 
-    public void SetWorldToolType (WorldToolType input) {
+    public void SetWorldToolType(WorldToolType input) {
         worldEditor.SetToolType(input);
     }
 
@@ -144,6 +144,10 @@ public class DisplaySystem {
 
     public WorldTile[][] LoadWorld() {
         return toolManager.LoadWorld();
+    }
+
+    public void ImportImageToTiles() {
+        worldEditor.ImportImageToTiles();
     }
 
     // PNG \\

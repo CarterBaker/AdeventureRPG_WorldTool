@@ -178,6 +178,10 @@ public class ToolPanel extends Table {
         return uiSystem.LoadWorld();
     }
 
+    public void ImportImageToTiles() {
+        uiSystem.ImportImageToTiles();
+    }
+
     // PNG \\
 
     public void SaveImage(int id, BufferedImage input) {

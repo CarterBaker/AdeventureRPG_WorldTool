@@ -11,7 +11,8 @@ public class SaveWorld {
 
     public SaveWorld(String path) {
         File folder = new File(path);
-        if (!folder.exists()) folder.mkdirs();
+        if (!folder.exists())
+            folder.mkdirs();
         this.saveFile = new File(folder, WorldFile);
     }
 
@@ -20,18 +21,18 @@ public class SaveWorld {
             int width = world.length;
             int height = world[0].length;
 
-            dos.writeInt(width);  // store grid size
+            dos.writeInt(width); // store grid size
             dos.writeInt(height);
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     WorldTile tile = world[x][y];
 
-                    dos.writeInt(tile.regionID);          // 4 bytes
-                    dos.writeFloat(tile.elevation);       // 4 bytes
-                    dos.writeFloat(tile.temperature);     // 4 bytes
-                    dos.writeByte(tile.road ? 1 : 0);      // 1 byte
-                    dos.writeByte(tile.river ? 1 : 0);     // 1 byte
+                    dos.writeInt(tile.regionID); // 4 bytes
+                    dos.writeInt(tile.elevation); // 4 bytes, int version
+                    dos.writeInt(tile.temperature); // 4 bytes, int version
+                    dos.writeByte(tile.road ? 1 : 0); // 1 byte
+                    dos.writeByte(tile.river ? 1 : 0); // 1 byte
                 }
             }
         } catch (IOException e) {
@@ -40,7 +41,8 @@ public class SaveWorld {
     }
 
     public WorldTile[][] Load() {
-        if (!saveFile.exists()) return null;
+        if (!saveFile.exists())
+            return null;
 
         try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(saveFile)))) {
             int width = dis.readInt();
@@ -51,8 +53,8 @@ public class SaveWorld {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     int regionID = dis.readInt();
-                    float elevation = dis.readFloat();
-                    float temperature = dis.readFloat();
+                    int elevation = dis.readInt();
+                    int temperature = dis.readInt();
                     boolean road = dis.readByte() == 1;
                     boolean river = dis.readByte() == 1;
 
@@ -66,4 +68,5 @@ public class SaveWorld {
             return null;
         }
     }
+
 }

@@ -148,6 +148,10 @@ public class UISystem {
         return toolManager.LoadWorld();
     }
 
+    public void ImportImageToTiles() {
+        toolManager.ImportImageToTiles();
+    }
+
     // PNG \\
 
     public void SaveImage(int id, BufferedImage input) {

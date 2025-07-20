@@ -2,12 +2,12 @@ package com.WorldTool;
 
 public class WorldTile {
     public int regionID;
-    public float elevation;
-    public float temperature;
+    public int elevation;
+    public int temperature;
     public boolean road;
     public boolean river;
 
-    public WorldTile(int regionID, float elevation, float temperature, boolean road, boolean river) {
+    public WorldTile(int regionID, int elevation, int temperature, boolean road, boolean river) {
         this.regionID = regionID;
         this.elevation = elevation;
         this.temperature = temperature;

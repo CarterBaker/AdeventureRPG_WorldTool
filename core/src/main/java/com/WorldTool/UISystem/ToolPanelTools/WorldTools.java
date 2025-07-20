@@ -39,6 +39,16 @@ public class WorldTools implements ToolProvider {
         if (toolPanel == null)
             return;
 
+        // --- Import Image Button ---
+        TextButton importImageButton = new TextButton("Import Image", skin);
+        importImageButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                toolPanel.ImportImageToTiles(); // Assumes ImportImageToTiles() exists on toolPanel
+            }
+        });
+        panel.add(importImageButton).left().pad(5).row();
+
         // --- World Scale Input ---
         scaleXField = new TextField("", skin);
         scaleYField = new TextField("", skin);

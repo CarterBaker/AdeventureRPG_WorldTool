@@ -10,7 +10,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
-
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.files.FileHandle;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.Map;
 
 public class WorldEditor implements Editor {
@@ -301,22 +304,14 @@ public class WorldEditor implements Editor {
     }
 
     private WorldTile applyHeightBrush(WorldTile tile, int button) {
-        float delta = 0.1f;
-        if (button == com.badlogic.gdx.Input.Buttons.LEFT) {
-            tile.elevation -= delta;
-        } else {
-            tile.elevation += delta;
-        }
+        int delta = (button == com.badlogic.gdx.Input.Buttons.LEFT) ? -1 : 1;
+        tile.elevation = clampByte(tile.elevation + delta);
         return tile;
     }
 
     private WorldTile applyTemperatureBrush(WorldTile tile, int button) {
-        float delta = 1.0f;
-        if (button == com.badlogic.gdx.Input.Buttons.LEFT) {
-            tile.temperature -= delta;
-        } else {
-            tile.temperature += delta;
-        }
+        int delta = (button == com.badlogic.gdx.Input.Buttons.LEFT) ? -1 : 1;
+        tile.temperature = clampByte(tile.temperature + delta);
         return tile;
     }
 
@@ -340,6 +335,10 @@ public class WorldEditor implements Editor {
         tiles = input;
     }
 
+    private int clampByte(int value) {
+        return Math.max(0, Math.min(255, value));
+    }
+
     private Color getTileColor(WorldTile tile) {
         switch (currentTool) {
             case regionBrush:
@@ -361,32 +360,27 @@ public class WorldEditor implements Editor {
         }
     }
 
-    private Color temperatureToColor(float temperature) {
-        float minTemp = -30f;
-        float maxTemp = 50f;
-
-        float t = Math.max(0, Math.min(1, (temperature - minTemp) / (maxTemp - minTemp)));
+    private Color temperatureToColor(int temperature) {
+        float t = clamp01(temperature / 255f);
 
         if (t < 0.25f) {
-            // Blue to Green
             return interpolateColor(Color.BLUE, Color.GREEN, t / 0.25f);
         } else if (t < 0.5f) {
-            // Green to Yellow
             return interpolateColor(Color.GREEN, Color.YELLOW, (t - 0.25f) / 0.25f);
         } else if (t < 0.75f) {
-            // Yellow to Orange
             return interpolateColor(Color.YELLOW, Color.ORANGE, (t - 0.5f) / 0.25f);
         } else {
-            // Orange to Red
             return interpolateColor(Color.ORANGE, Color.RED, (t - 0.75f) / 0.25f);
         }
     }
 
-    private Color heightToColor(float elevation) {
-        float minElev = 0f;
-        float maxElev = 10f; // Adjust if necessary
-        float t = Math.max(0, Math.min(1, (elevation - minElev) / (maxElev - minElev)));
+    private Color heightToColor(int elevation) {
+        float t = clamp01(elevation / 255f);
         return interpolateColor(Color.BLACK, Color.WHITE, t);
+    }
+
+    private float clamp01(float value) {
+        return Math.max(0f, Math.min(1f, value));
     }
 
     private Color interpolateColor(Color start, Color end, float t) {
@@ -395,6 +389,50 @@ public class WorldEditor implements Editor {
         float b = start.b + t * (end.b - start.b);
         float a = start.a + t * (end.a - start.a);
         return new Color(r, g, b, a);
+    }
+
+    public void ImportImageToTiles() {
+        // 1. Use Swing file chooser to pick image
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select World Map Image");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
+
+        int result = fileChooser.showOpenDialog(null);
+        if (result != JFileChooser.APPROVE_OPTION)
+            return;
+
+        FileHandle file = new FileHandle(fileChooser.getSelectedFile());
+
+        // 2. Load image using LibGDX Pixmap
+        Pixmap pixmap = new Pixmap(file);
+
+        int width = pixmap.getWidth();
+        int height = pixmap.getHeight();
+        WorldTile[][] newTiles = new WorldTile[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgba = pixmap.getPixel(x, y);
+
+                int r = (rgba >> 24) & 0xFF;
+                int g = (rgba >> 16) & 0xFF;
+                int b = (rgba >> 8) & 0xFF;
+                int a = rgba & 0xFF;
+
+                WorldTile tile = new WorldTile();
+                tile.regionID = r;
+                tile.elevation = g; // Scale green to elevation 0–10
+                tile.temperature = b; // Scale blue to temperature -30 to 50
+
+                tile.road = (a == 1);
+                tile.river = (a == 2);
+
+                newTiles[height - 1 - y][x] = tile; // flip vertically for conventional top-down orientation
+            }
+        }
+
+        pixmap.dispose();
+        this.tiles = newTiles;
     }
 
 }

@@ -107,7 +107,7 @@ public class ToolManager implements Screen {
 
     // World \\
 
-    public void SetWorldToolType (WorldToolType input) {
+    public void SetWorldToolType(WorldToolType input) {
         displaySystem.SetWorldToolType(input);
     }
 
@@ -133,6 +133,10 @@ public class ToolManager implements Screen {
 
     public WorldTile[][] LoadWorld() {
         return saveSystem.LoadWorld();
+    }
+
+    public void ImportImageToTiles() {
+        displaySystem.ImportImageToTiles();
     }
 
     // PNG \\
